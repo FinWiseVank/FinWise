@@ -1,7 +1,29 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { DbInicio } from './DbInicio'
+import { DbPlanificador } from './DbPlanificador'
+import { DbAñadirMetas } from './DbAñadirMetas'
+import { DbAñadirRecordatorio } from './DbAñadirRecordatorio'
+
 
 export const Dashboard = () => {
+  const [activeContent, setActiveContent] = useState('inicio')
+
+  const renderContent = () => {
+    switch (activeContent) {
+      case 'inicio':
+        return <DbInicio />
+      case 'planificador':
+        return <DbPlanificador />
+      case 'añadir-Metas':
+        return <DbAñadirMetas />
+      case 'añadir-Recordatorios':
+        return <DbAñadirRecordatorio />
+      default:
+        return <DbInicio />
+    }
+  }
+
   return (
     <div className='content-dashboard'>
         <header>
@@ -14,21 +36,26 @@ export const Dashboard = () => {
                 <nav className='flex-1 flex justify-center'>
                     <ul className='flex space-x-4'>
                         <li>
-                            <Link to="/inicio" className='text-white hover:text-[#5ea3d4]'>Inicio</Link>
+                            <Link to="#" className='text-white hover:text-[#5ea3d4]' onClick={() => setActiveContent('inicio')}>Inicio</Link>
                         </li>
                         <li>
-                            <Link to="/planificador" className='text-white hover:text-[#5ea3d4]'>Planificador</Link>
+                            <Link to="#" className='text-white hover:text-[#5ea3d4]' onClick={() => setActiveContent('planificador')}>Planificador</Link>
                         </li>
                         <li>
-                            <Link to="/añadir-Metas" className='text-white hover:text-[#5ea3d4]'>Añadir Metas</Link>
+                            <Link to="#" className='text-white hover:text-[#5ea3d4]' onClick={() => setActiveContent('añadir-Metas')}>Añadir Metas</Link>
                         </li>
                         <li>
-                            <Link to="/añadir-Recordatorios" className='text-white hover:text-[#5ea3d4]'>Añadir Recordatorios</Link>
+                            <Link to="#" className='text-white hover:text-[#5ea3d4]' onClick={() => setActiveContent('añadir-Recordatorios')}>Añadir Recordatorios</Link>
                         </li>
                     </ul>
                 </nav>
             </div>
         </header>
+
+        {/* Contenido principal del Dashboard */}
+        <main className='mt-20 p-8'>
+            {renderContent()}
+        </main>
     </div>
   )
 }
