@@ -2,7 +2,7 @@ import * as React from 'react';
 
 export default function Form() {
     return ( 
-        <div className='bg-[#FDFFFC] px-10 py-10 rounded-2xl border-2 border-gray-100'>
+        <div className='bg-[#FDFFFC] px-10 py-8 rounded-2xl border-2 border-gray-100'>
             <h1 className='text-5xl font-semibold'>FinWise</h1>
             <p className='font-medium text-lg text-[#5EA3D4] mt-4'>Iniciar Sesión</p>
            <div className='mt-8'>
@@ -22,7 +22,7 @@ export default function Form() {
                     />
                 </div>
 
-                <div className='mt-8 flex justify-between items-center'>
+                <div className='mt-5 flex justify-between items-center'>
                     <div>
                         <input 
                             type='checkbox'
@@ -33,8 +33,12 @@ export default function Form() {
                     <button className='font-medium text-base text-[#5EA3D4]'>olvide contraseña</button>
                 </div>
 
-                <div className='mt-8 flex flex-col gap-y-4'>
+                <div className='mt-10 flex flex-col gap-y-4'>
                     <button className='active:scale-[.98] active:duration-75 transition-all hover:scale-[1.01] ease-in-out py-3 rounded-xl bg-[#5EA3D4] text-white text-lg font-bold'>Ingresar</button>
+                </div>
+                <div className='mt-5 flex justify-center items-center'>
+                    <p className='font-medium text-base'>¿No tienes cuenta?</p>
+                    <button className='text-[#5EA3D4] text-base font-medium ml-2'>Registrate</button>
                 </div>
            </div>
         </div>

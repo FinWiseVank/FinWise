@@ -1,11 +1,14 @@
-import Login from "./pages/auth/login"
+import Login from "./pages/auth/Login"
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
   return (
-    <div> 
-      <Login />
-
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+      </Routes>
+    </BrowserRouter> 
+    
   )
 }
 
