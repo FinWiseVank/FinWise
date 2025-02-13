@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { DbInicio } from './DbInicio'
-import { DbPlanificador } from './DbPlanificador'
-import { DbAñadirMetas } from './DbAñadirMetas'
-import { DbAñadirRecordatorio } from './DbAñadirRecordatorio'
+import { DbInicio } from '../components/DbInicio'
+import { DbPlanificador } from '../components/DbPlanificador'
+import { DbAñadirMetas } from '../components/DbAñadirMetas'
+import { DbAñadirRecordatorio } from '../components/DbAñadirRecordatorio'
 
 
 export const Dashboard = () => {
