@@ -8,7 +8,7 @@ import { FaDollarSign } from "react-icons/fa6";
 import { Messages } from '../components/Messages';
 import { ModeNigth } from '../components/ModeNigth'; // Importa el componente Modenigth
 
-export const Dashboard = () => {
+const Dashboard = () => {
   const [activeContent, setActiveContent] = useState('inicio');
 
   const renderContent = () => {
@@ -95,3 +95,5 @@ export const Dashboard = () => {
     </div>
   );
 };
+
+export default Dashboard;
