@@ -1,14 +1,23 @@
 import Login from "./pages/auth/Login"
-import { Dashboard } from "./pages/Dashboard";
+import Register from "./pages/auth/Register"
+import RestaurarContraseña from "./pages/auth/RestaurarContraseña"
+import Dashboard from "./pages/Dashboard"
+import NotFound from "./pages/NotFound"
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-function App() {
+const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<Login />} />
+        <Route index element={<Login />} /> 
+        <Route path="/iniciar-sesion" element={<Login />} />
+        <Route path="/registro" element={<Register />} />
+        <Route path="/restaurar-contraseña" element={<RestaurarContraseña />} />
+        <Route path="/404" element={<NotFound />} />
         <Route path="/dashboard" element={<Dashboard />} />
+
       </Routes>
+
     </BrowserRouter> 
     
   )

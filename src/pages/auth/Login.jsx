@@ -1,7 +1,7 @@
-import Form from "../../components/Form";
+import Form from "../../components/FormLogin";
 import fondoLogin from '../../assets/fondoLogin.jpg';
 
-function Login() {
+const Login = () =>{
   return (
     <div className="flex w-full h-screen bg-[#EAEDED]">
         <div className="hidden lg:flex w-1/2 h-full  bg-cover bg-center overflow-hidden shadow-lg" style={{ backgroundImage: `url(${fondoLogin})` }}/>
