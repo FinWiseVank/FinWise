@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Table } from './Table';
 import { Button } from './Button';
 import FormTemplate from './FormTemplate';
+import { Card } from './Card';
 
 export const DbPlanificador = () => {
   const [tableData, setTableData] = useState([]);
@@ -46,6 +47,7 @@ export const DbPlanificador = () => {
   ];
 
   return (
+    <Card>
     <div>
       <Table title="Planificador de Gastos" data={tableData} />
       <div className="flex justify-center my-4">
@@ -53,7 +55,7 @@ export const DbPlanificador = () => {
       </div>
       {showForm && (
         <FormTemplate onSubmit={handleFormSubmit} onCancel={handleCancel}>
-          <h2 className='text-center text-2xl font-bold my-4 text-white'>Agregar a la tabla</h2>
+          <h2 className='text-center text-2xl font-bold my-4 text-Black'>Agregar a la tabla</h2>
           {formStructure.map((field, index) => (
             <input
               key={index}
@@ -68,5 +70,6 @@ export const DbPlanificador = () => {
         </FormTemplate>
       )}
     </div>
+    </Card>
   );
 };

@@ -68,7 +68,7 @@ export const Calendar = () => {
       />
       {showForm && (
         <FormTemplate onSubmit={handleFormSubmit} onCancel={handleCancel}>
-          <h2 className='text-center text-2xl font-bold my-4 text-white'>Agregar Evento</h2>
+          <h2 className='text-center text-2xl font-bold my-4 text-black'>Agregar Evento</h2>
           <label className="block text-white text-sm font-bold mb-2" htmlFor="title">
             Título del evento
           </label>

@@ -26,11 +26,11 @@ const Dashboard = () => {
     }
   };
 
-  return (
+  return (  
     <div className='content-dashboard'>
       <header>
-        <div className='bg-[#011627] fixed top-0 w-full h-20 p-8 flex items-center '>
-          <div className='text-white uppercase font-bold text-2xl tracking-[4px]'>
+        <div className='bg-[#ffffff] fixed top-0 w-full h-20 p-8 flex items-center '>
+          <div className='text-black uppercase font-bold text-2xl tracking-[4px]'>
             <h1>JT logo</h1>
           </div>
 
@@ -40,7 +40,7 @@ const Dashboard = () => {
               <li>
                 <Link
                   to="#"
-                  className={`text-white hover:underline hover:decoration-white ${activeContent === 'inicio' ? 'underline decoration-white' : ''}`}
+                  className={`text-[#465FFF] hover:underline hover:decoration-[#465FFF] ${activeContent === 'inicio' ? 'underline decoration-[#ecf3ff]' : ''}`}
                   onClick={() => setActiveContent('inicio')}
                 >
                   Inicio
@@ -49,7 +49,7 @@ const Dashboard = () => {
               <li>
                 <Link
                   to="#"
-                  className={`text-white hover:underline hover:decoration-white ${activeContent === 'planificador' ? 'underline decoration-white' : ''}`}
+                  className={`text-[#465FFF] hover:underline hover:decoration-[#465FFF] ${activeContent === 'planificador' ? 'underline decoration-[#ecf3ff]' : ''}`}
                   onClick={() => setActiveContent('planificador')}
                 >
                   Planificador
@@ -58,7 +58,7 @@ const Dashboard = () => {
               <li>
                 <Link
                   to="#"
-                  className={`text-white hover:underline hover:decoration-white ${activeContent === 'añadir-Metas' ? 'underline decoration-white' : ''}`}
+                  className={`text-[#465FFF] hover:underline hover:decoration-[#465FFF] ${activeContent === 'añadir-Metas' ? 'underline decoration-[#ecf3ff]' : ''}`}
                   onClick={() => setActiveContent('añadir-Metas')}
                 >
                   Añadir Metas
@@ -67,7 +67,7 @@ const Dashboard = () => {
               <li>
                 <Link
                   to="#"
-                  className={`text-white hover:underline hover:decoration-white ${activeContent === 'añadir-Recordatorios' ? 'underline decoration-white' : ''}`}
+                  className={`text-[#465FFF] hover:underline hover:decoration-[#465FFF] ${activeContent === 'añadir-Recordatorios' ? 'underline decoration-[#ecf3ff]' : ''}`}
                   onClick={() => setActiveContent('añadir-Recordatorios')}
                 >
                   Añadir Recordatorios
@@ -80,7 +80,8 @@ const Dashboard = () => {
       </header>
 
       {/* Contenido principal del Dashboard */}
-      <main className='mt-20 p-8'>
+      <main className='mt-[5rem] p-8 bg-[#E5E7EB] min-h-screen'>
+        {/* Ajuste de mt-[5rem] para evitar superposición */}
         <div className='flex justify-left'>
           <FaDollarSign />
           <h1>Fondos</h1>

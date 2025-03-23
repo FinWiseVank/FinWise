@@ -12,7 +12,7 @@
 }
 
 .form-container {
-  background: #003366;
+  background: #ffffff;
   padding: 40px; /* Aumentar el tamaño del contenedor */
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
@@ -26,7 +26,7 @@ form {
 input, textarea, select {
   margin-bottom: 10px;
   padding: 10px;
-  border: none;
+  border: solid 1px #ccc;
   border-radius: 5px;
   background: #fff;
   color: #000;
