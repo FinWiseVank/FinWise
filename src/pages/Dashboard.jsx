@@ -6,90 +6,48 @@ import { DbAñadirMetas } from '../components/DbAñadirMetas';
 import { DbAñadirRecordatorio } from '../components/DbAñadirRecordatorio';
 import { FaDollarSign } from "react-icons/fa6";
 import { Messages } from '../components/Messages';
-import { ModeNigth } from '../components/ModeNigth'; // Importa el componente Modenigth
+import { ModeNigth } from '../components/ModeNigth';
 
 const Dashboard = () => {
   const [activeContent, setActiveContent] = useState('inicio');
 
-  const renderContent = () => {
-    switch (activeContent) {
-      case 'inicio':
-        return <DbInicio />;
-      case 'planificador':
-        return <DbPlanificador />;
-      case 'añadir-Metas':
-        return <DbAñadirMetas />;
-      case 'añadir-Recordatorios':
-        return <DbAñadirRecordatorio />;
-      default:
-        return <DbInicio />;
-    }
+  const contentMap = {
+    inicio: <DbInicio />,
+    planificador: <DbPlanificador />,
+    'añadir-Metas': <DbAñadirMetas />,
+    'añadir-Recordatorios': <DbAñadirRecordatorio />
   };
 
-  return (  
-    <div className='content-dashboard'>
-      <header>
-        <div className='bg-[#ffffff] fixed top-0 w-full h-20 p-8 flex items-center '>
-          <div className='text-black uppercase font-bold text-2xl tracking-[4px]'>
-            <h1>JT logo</h1>
-          </div>
-
-          {/* Barra de navegación */}
-          <nav className='flex-1 flex justify-center'>
-            <ul className='flex space-x-4'>
-              <li>
+  return (
+    <div className='content-dashboard flex flex-col md:flex-row w-full'>
+      <header className='bg-[#ffffff] fixed top-0 w-full h-16 md:h-20 p-4 flex items-center'>
+        <h1 className='text-black uppercase font-bold text-base md:text-2xl tracking-[1px] md:tracking-[4px]'>JT logo</h1>
+        <nav className='flex-1 flex justify-center'>
+          <ul className='flex flex-row flex-wrap justify-center space-x-4 text-sm md:text-base'>
+            {Object.keys(contentMap).map((key) => (
+              <li key={key}>
                 <Link
                   to="#"
-                  className={`text-[#465FFF] hover:underline hover:decoration-[#465FFF] ${activeContent === 'inicio' ? 'underline decoration-[#ecf3ff]' : ''}`}
-                  onClick={() => setActiveContent('inicio')}
+                  className={`text-[#465FFF] hover:underline hover:decoration-[#465FFF] ${activeContent === key ? 'underline decoration-[#ecf3ff]' : ''}`}
+                  onClick={() => setActiveContent(key)}
                 >
-                  Inicio
+                  {key.replace('-', ' ')}
                 </Link>
               </li>
-              <li>
-                <Link
-                  to="#"
-                  className={`text-[#465FFF] hover:underline hover:decoration-[#465FFF] ${activeContent === 'planificador' ? 'underline decoration-[#ecf3ff]' : ''}`}
-                  onClick={() => setActiveContent('planificador')}
-                >
-                  Planificador
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="#"
-                  className={`text-[#465FFF] hover:underline hover:decoration-[#465FFF] ${activeContent === 'añadir-Metas' ? 'underline decoration-[#ecf3ff]' : ''}`}
-                  onClick={() => setActiveContent('añadir-Metas')}
-                >
-                  Añadir Metas
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="#"
-                  className={`text-[#465FFF] hover:underline hover:decoration-[#465FFF] ${activeContent === 'añadir-Recordatorios' ? 'underline decoration-[#ecf3ff]' : ''}`}
-                  onClick={() => setActiveContent('añadir-Recordatorios')}
-                >
-                  Añadir Recordatorios
-                </Link>
-              </li>
-            </ul>
-          </nav>
-          <ModeNigth /> {/* Añade el componente Modenigth aquí */}
-        </div>
+            ))}
+          </ul>
+        </nav>
+        <ModeNigth />
       </header>
 
-      {/* Contenido principal del Dashboard */}
-      <main className='mt-[5rem] p-8 bg-[#E5E7EB] min-h-screen'>
-        {/* Ajuste de mt-[5rem] para evitar superposición */}
-        <div className='flex justify-left'>
-          <FaDollarSign />
-          <h1>Fondos</h1>
+      <main className='mt-[4rem] md:mt-[5rem] p-4 md:p-8 bg-[#E5E7EB] min-h-screen w-full'>
+        <div className='flex items-center space-x-2'>
+          <FaDollarSign className='text-lg md:text-xl' />
+          <h1 className='text-base md:text-lg'>Fondos</h1>
         </div>
-        {renderContent()}
+        {contentMap[activeContent]}
       </main>
 
-      {/* Botón de mensajería fijo */}
       <div className='fixed bottom-4 right-4'>
         <Messages />
       </div>
