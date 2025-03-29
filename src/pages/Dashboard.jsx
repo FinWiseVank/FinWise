@@ -7,6 +7,7 @@ import { DbAñadirRecordatorio } from '../components/DbAñadirRecordatorio';
 import { FaDollarSign } from "react-icons/fa6";
 import { Messages } from '../components/Messages';
 import { ModeNigth } from '../components/ModeNigth';
+import { UserName } from '../components/UserName';
 
 const Dashboard = () => {
   const [activeContent, setActiveContent] = useState('inicio');
@@ -37,7 +38,10 @@ const Dashboard = () => {
             ))}
           </ul>
         </nav>
-        <ModeNigth />
+        <div className="flex items-center space-x-4">
+          <UserName />
+          <ModeNigth />
+        </div>
       </header>
 
       <main className='mt-[4rem] md:mt-[5rem] p-4 md:p-8 bg-[#E5E7EB] min-h-screen w-full'>

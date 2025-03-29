@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Table } from './Table';
 import { Button } from './Button';
 import FormTemplate from './FormTemplate';
 import { Card } from './Card';
+import { MenuModify } from './MenuModify'; // Importar MenuModify
 
 export const DbPlanificador = () => {
   const [tableData, setTableData] = useState([]);
@@ -12,6 +12,7 @@ export const DbPlanificador = () => {
     gastosPrevistos: '',
     gastosReales: ''
   });
+  const [hoveredRowIndex, setHoveredRowIndex] = useState(null); // Estado para rastrear la fila sobre la que se pasa el cursor
 
   const handleAddRow = () => {
     setShowForm(true);
@@ -33,6 +34,25 @@ export const DbPlanificador = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleEditRow = (index) => {
+    const rowToEdit = tableData[index];
+    setFormData({ ...rowToEdit }); // Cargar los datos de la fila en el formulario
+    setShowForm(true);
+  };
+
+  const handleDeleteRow = (index) => {
+    const updatedTableData = tableData.filter((_, i) => i !== index); // Eliminar la fila localmente
+    setTableData(updatedTableData);
+  };
+
+  const handleMouseEnter = (index) => {
+    setHoveredRowIndex(index);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredRowIndex(null);
+  };
+
   const formStructure = [
     { name: 'descripcion', label: 'Descripción', type: 'text' },
     { name: 'gastosPrevistos', label: 'Gastos Previstos', type: 'text' },
@@ -43,7 +63,43 @@ export const DbPlanificador = () => {
     <Card>
       <div>
         <div className="overflow-x-auto md:overflow-visible w-full"> {/* Ajustar overflow y ancho */}
-          <Table title="Planificador de Gastos" data={tableData} />
+          <table className="table-auto w-full border-collapse border border-gray-300">
+            <thead>
+              <tr>
+                <th className="border border-gray-300 px-4 py-2">Descripción</th>
+                <th className="border border-gray-300 px-4 py-2">Gastos Previstos</th>
+                <th className="border border-gray-300 px-4 py-2">Gastos Reales</th>
+                <th className="border border-gray-300 px-4 py-2">Diferencia</th>
+                <th className="border border-gray-300 px-4 py-2">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tableData.map((row, index) => {
+                const diferencia = parseFloat(row.gastosPrevistos || 0) - parseFloat(row.gastosReales || 0);
+                return (
+                  <tr
+                    key={index}
+                    onMouseEnter={() => handleMouseEnter(index)}
+                    onMouseLeave={handleMouseLeave}
+                    className="hover:bg-gray-100"
+                  >
+                    <td className="border border-gray-300 px-4 py-2">{row.descripcion}</td>
+                    <td className="border border-gray-300 px-4 py-2">{row.gastosPrevistos}</td>
+                    <td className="border border-gray-300 px-4 py-2">{row.gastosReales}</td>
+                    <td className="border border-gray-300 px-4 py-2">{diferencia.toFixed(2)}</td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {hoveredRowIndex === index && (
+                        <MenuModify 
+                          onEdit={() => handleEditRow(index)} 
+                          onDelete={() => handleDeleteRow(index)} 
+                        />
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
         <div className="flex justify-center my-4">
           <Button onClick={handleAddRow} />
