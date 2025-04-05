@@ -1,28 +1,43 @@
 import React, {useState} from 'react';
 import {Link} from  "react-router-dom";
 import {toast} from 'react-toastify'; 
+import axios from 'axios';
 
 const Form = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if([email, password].includes('')){
+        if ([email, password].includes('')) {
             toast.error('Todos los campos son obligatorios', {
                 theme: "colored",
                 position: "top-center",
-            }); 
+            });
             return;
         }
 
-        if(password.length < 6){
+        if (password.length < 6) {
             toast.error('La contraseña debe tener al menos 6 caracteres', {
                 theme: "colored",
                 position: "top-center",
-            }); 
+            });
             return;
+        }
+
+        try {
+            const response = await axios.post('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/user/login', { email, contrasenia: password });
+            toast.success('Inicio de sesión exitoso', {
+                theme: "colored",
+                position: "top-center",
+            });
+            console.log(response.data);
+        } catch (error) {
+            toast.error(error.response?.data?.error || 'Error al iniciar sesión', {
+                theme: "colored",
+                position: "top-center",
+            });
         }
     }
 
