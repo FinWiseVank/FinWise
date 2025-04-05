@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Link} from  "react-router-dom";
 import {toast} from 'react-toastify'; 
-import { Axios } from 'axios';
+import axios from 'axios';
 
 const FormRegister = () => {
     const [name, setName] = useState('');
@@ -10,35 +10,52 @@ const FormRegister = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if([name, lastName, email, password, confirmPassword].includes('')){
+        if ([name, lastName, email, password, confirmPassword].includes('')) {
             toast.error('Todos los campos son obligatorios', {
                 theme: "colored",
                 position: "top-center",
-            }); 
+            });
             return;
-
         }
 
-        if(password.length < 6){
+        if (password.length < 6) {
             toast.error('La contraseña debe tener al menos 6 caracteres', {
                 theme: "colored",
                 position: "top-center",
-            }); 
+            });
             return;
         }
 
-        if(password !== confirmPassword){
+        if (password !== confirmPassword) {
             toast.error('Las contraseñas no coinciden', {
                 theme: "colored",
                 position: "top-center",
-            }); 
+            });
             return;
         }
 
-    }
+        try {
+            const response = await axios.post('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/user/register', {
+                nombre: name,
+                apellidos: lastName,
+                email,
+                contrasenia: password,
+            });
+            toast.success('Registro exitoso', {
+                theme: "colored",
+                position: "top-center",
+            });
+            console.log(response.data);
+        } catch (error) {
+            toast.error(error.response?.data?.error || 'Error al registrarse', {
+                theme: "colored",
+                position: "top-center",
+            });
+        }
+    };
 
     return (    
         <div className='bg-[#FDFFFC] px-10 py-2 rounded-2xl border-2 border-gray-100'>
@@ -63,7 +80,7 @@ const FormRegister = () => {
                         type='text'
                         className='w-full border-2 border-gray-100 rounded-xl p-1.5 mt-1 bg-transparent'
                         placeholder='Ingresa tu apellidos'
-                        value={name}
+                        value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
                     />
                 </div>

@@ -4,7 +4,6 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import axios from 'axios';
 
-//ruta base de backend
 axios.defaults.baseURL = 'https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net';
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 

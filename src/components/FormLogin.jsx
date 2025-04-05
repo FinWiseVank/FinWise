@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Link} from  "react-router-dom";
 import {toast} from 'react-toastify'; 
-import {axios} from 'axios';
+import axios from 'axios';
 
 const Form = () => {
     const [email, setEmail] = useState('');
@@ -10,19 +10,19 @@ const Form = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if([email, password].includes('')){
+        if ([email, password].includes('')) {
             toast.error('Todos los campos son obligatorios', {
                 theme: "colored",
                 position: "top-center",
-            }); 
+            });
             return;
         }
 
-        if(password.length < 6){
+        if (password.length < 6) {
             toast.error('La contraseña debe tener al menos 6 caracteres', {
                 theme: "colored",
                 position: "top-center",
-            }); 
+            });
             return;
         }
 
