@@ -1,12 +1,13 @@
 import React, {useState} from 'react';
 import {Link} from  "react-router-dom";
 import {toast} from 'react-toastify'; 
+import {axios} from 'axios';
 
 const Form = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         if([email, password].includes('')){
@@ -24,9 +25,24 @@ const Form = () => {
             }); 
             return;
         }
+
+        try {
+            const response = await axios.post('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/user/login', { email, contrasenia: password });
+            toast.success('Inicio de sesión exitoso', {
+                theme: "colored",
+                position: "top-center",
+            });
+            console.log(response.data);
+        } catch (error) {
+            toast.error(error.response?.data?.error || 'Error al iniciar sesión', {
+                theme: "colored",
+                position: "top-center",
+            });
+        }
     }
 
-    return (    
+    return (  
+
         <div className='bg-[#FDFFFC] px-10 py-8 rounded-2xl border-2 border-gray-100'>
             <h1 className='text-5xl font-semibold'>FinWise</h1>
             <p className='font-medium text-lg text-[#5EA3D4] mt-4'>Iniciar Sesión</p>
