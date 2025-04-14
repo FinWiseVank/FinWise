@@ -27,8 +27,9 @@ const Form = () => {
         }
 
         try {
-            const response = await axios.post('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/user/login', { email, contrasenia: password });
-            toast.success('Inicio de sesión exitoso', {
+           // const response = await axios.post('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/user/login', { email, contrasenia: password });
+           const response = await axios.post('http://localhost:3000/user/login', { email, contrasenia: password }); 
+           toast.success('Inicio de sesión exitoso', {
                 theme: "colored",
                 position: "top-center",
             });

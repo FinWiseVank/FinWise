@@ -4,6 +4,8 @@ import { GraphGeneral } from './GraphGeneral'
 import clsx from 'clsx'
 import { Card } from './Card'
 import FormTemplate from './FormTemplate'; // Importar FormTemplate
+import GraphCircule from './GraphCircule'; // Importar GraphCircule
+
 
 export const DbInicio = () => {
   const [showSubmenu, setShowSubmenu] = useState(false);
@@ -122,16 +124,61 @@ export const DbInicio = () => {
           </div>
         </FormTemplate>
       )}
-      <Card>
-        <div className='flex flex-col items-center justify-center w-full h-full bg-white bg-opacity-75 p-4 rounded shadow-lg'>
-          <h2 className='text-lg md:text-2xl font-bold mb-4'>Resumen de Gastos</h2>
-          <p className='text-sm md:text-base text-gray-600'>Aquí puedes ver un resumen de tus gastos e ingresos.</p>
-        </div>
-        <div className='flex flex-col items-center justify-center w-full h-full bg-white bg-opacity-75 p-4 rounded shadow-lg mt-4'>
-          <h2 className='text-lg md:text-2xl font-bold mb-4'>Resumen de Ingresos</h2>
-          <p className='text-sm md:text-base text-gray-600'>Aquí puedes ver un resumen de tus ingresos.</p>   
-        </div>
-      </Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full mt-0.1"> {/* Reducido margen superior */}
+        <Card className="bg-white bg-opacity-75 p-6 rounded shadow-lg mt-1 ml-1"> {/* Añadido margen izquierdo */}
+          <div className='flex flex-col items-center justify-center w-full h-full'>
+            <h2 className='text-lg md:text-2xl font-bold mb-4'>Resumen de Gastos</h2>
+            <div className="w-full h-auto">
+              <GraphCircule data={[
+                { name: 'Alquiler', value: 500 },
+                { name: 'Comida', value: 300 },
+                { name: 'Transporte', value: 200 },
+              ]} />
+            </div>
+            <button className='mt-4 px-4 py-2 bg-blue-500 text-white rounded transition-transform transform hover:scale-105 hover:bg-blue-600 cursor-pointer'>
+              Ver Resumen
+            </button>
+          </div>
+        </Card>
+        <Card className="bg-white bg-opacity-75 p-6 rounded shadow-lg mt-1 ml-1"> {/* Añadido margen izquierdo */}
+          <div className='flex flex-col items-center justify-center w-full h-full'>
+            <h2 className='text-lg md:text-2xl font-bold mb-4'>Transacciones</h2>
+            <ul className="w-full space-y-2">
+              <li className="flex justify-between border-b pb-2">
+                <span>Compra en supermercado</span>
+                <span className="text-red-500">- $50</span>
+              </li>
+              <li className="flex justify-between border-b pb-2">
+                <span>Pago de salario</span>
+                <span className="text-green-500">+ $1000</span>
+              </li>
+              <li className="flex justify-between border-b pb-2">
+                <span>Transporte</span>
+                <span className="text-red-500">- $20</span>
+              </li>
+              <li className="flex justify-between">
+                <span>Freelance</span>
+                <span className="text-green-500">+ $500</span>
+              </li>
+            </ul>
+          </div>
+        </Card>
+        <Card className="bg-white bg-opacity-75 p-6 rounded shadow-lg mt-1 ml-1"> {/* Añadido margen izquierdo */}
+          <div className='flex flex-col items-center justify-center w-full h-full'>
+            <h2 className='text-lg md:text-2xl font-bold mb-4'>Resumen de Ingresos</h2>
+            <div className="w-full h-auto">
+              <GraphCircule data={[
+                { name: 'Salario', value: 1000 },
+                { name: 'Freelance', value: 500 },
+                { name: 'Inversiones', value: 300 },
+              ]} />
+            </div>
+            <button className='mt-4 px-4 py-2 bg-blue-500 text-white rounded transition-transform transform hover:scale-105 hover:bg-blue-600 cursor-pointer'>
+              Ver Resumen
+            </button>
+          </div>
+        </Card>
+      </div>
     </>
   )
 }

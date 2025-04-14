@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { DbInicio } from '../components/DbInicio';
 import { DbPlanificador } from '../components/DbPlanificador';
 import { DbAñadirMetas } from '../components/DbAñadirMetas';
@@ -11,6 +12,16 @@ import { UserName } from '../components/UserName';
 
 const Dashboard = () => {
   const [activeContent, setActiveContent] = useState('inicio');
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await axios.post('/api/logout');
+      navigate('/login');
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
+  };
 
   const contentMap = {
     inicio: <DbInicio />,
@@ -38,9 +49,14 @@ const Dashboard = () => {
             ))}
           </ul>
         </nav>
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-4"> {/* Cambiado a flex-row para alinear en línea */}
           <UserName />
-          <ModeNigth />
+          <button 
+            onClick={handleLogout} 
+            className="px-0.8 py-0.5 bg-red-500 text-white rounded hover:bg-red-600 transition-transform transform hover:scale-105"
+          >
+            Cerrar Sesión
+          </button>
         </div>
       </header>
 
