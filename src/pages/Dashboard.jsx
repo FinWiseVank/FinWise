@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+// Dashboard.jsx
+import React, { useState, useEffect } from 'react'; // <-- AGREGA useEffect aquí
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { DbInicio } from '../components/DbInicio';
@@ -7,12 +8,27 @@ import { DbAñadirMetas } from '../components/DbAñadirMetas';
 import { DbAñadirRecordatorio } from '../components/DbAñadirRecordatorio';
 import { FaDollarSign } from "react-icons/fa6";
 import { Messages } from '../components/Messages';
-import { ModeNigth } from '../components/ModeNigth';
-import { UserName } from '../components/UserName';
+import UserName from '../components/UserName'; // ✅ Importación correcta para default export
+
 
 const Dashboard = () => {
+  const [data, setData] = useState(null);
   const [activeContent, setActiveContent] = useState('inicio');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get('http://localhost:3000/dashboard/data'  );
+        setData(res.data);
+        console.log('Datos del usuario:', res.data);
+      } catch (error) {
+        console.error('Error al obtener los datos del dashboard:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -24,10 +40,10 @@ const Dashboard = () => {
   };
 
   const contentMap = {
-    inicio: <DbInicio />,
-    planificador: <DbPlanificador />,
-    'añadir-Metas': <DbAñadirMetas />,
-    'añadir-Recordatorios': <DbAñadirRecordatorio />
+    inicio: <DbInicio resumenFinanzas={data?.resumenFinanzas} />,
+    planificador: <DbPlanificador planificador={data?.planificador} />,
+    'añadir-Metas': <DbAñadirMetas metas={data?.metas} />,
+    'añadir-Recordatorios': <DbAñadirRecordatorio recordatorios={data?.recordatorios} />
   };
 
   return (
