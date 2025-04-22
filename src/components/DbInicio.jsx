@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { toast } from 'react-toastify';
 import { Button } from './Button';
 import { GraphGeneral } from './GraphGeneral';
 import { Card } from './Card';
@@ -17,7 +18,6 @@ export const DbInicio = ({ resumenFinanzas }) => {
   });
   const [categorias, setCategorias] = useState([]);
   const [showCategoriaDropdown, setShowCategoriaDropdown] = useState(false);
-
   const categoriaRef = useRef(null);
 
   const toggleSubmenu = () => setShowSubmenu(!showSubmenu);
@@ -34,21 +34,39 @@ export const DbInicio = ({ resumenFinanzas }) => {
     }
   };
 
-  const handleTransactionInputChange = (event) => {
-    const { name, value } = event.target;
-    setTransactionData({ ...transactionData, [name]: value });
+  const handleTransactionInputChange = (e) => {
+    const { name, value } = e.target;
+    setTransactionData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleTransactionFormSubmit = async (event) => {
-    event.preventDefault();
+  const handleTransactionFormSubmit = async (e) => {
+    e.preventDefault();
+
+    const { descripcion, monto, categoria_id } = transactionData;
+
+    if (!descripcion || !monto || !categoria_id) {
+      toast.error('Por favor, complete todos los campos', {
+        theme: 'colored',
+        position: 'top-center'
+      });
+      return;
+    }
+
     try {
       const nuevaTransaccion = {
         ...transactionData,
+        categoria_id: parseInt(categoria_id),
         tipo: transactionType.toLowerCase(),
         fecha: new Date().toISOString()
       };
-      await axios.post('/api/transacciones', nuevaTransaccion);
-      alert('Transacción registrada correctamente');
+      await axios.post('http://localhost:3000/dashboard/addTransactions', nuevaTransaccion);
+      toast.success('Transacción registrada exitosamente', {
+        theme: 'colored',
+        position: 'top-center'
+        
+      });
+      // Actualizar los datos después de añadir la transacción
+      await fetchDashboardData();
     } catch (error) {
       console.error('Error al enviar transacción:', error);
       alert('Error al registrar la transacción');
@@ -62,11 +80,10 @@ export const DbInicio = ({ resumenFinanzas }) => {
     setTransactionData({ descripcion: '', monto: '', categoria_id: '' });
     setShowCategoriaDropdown(false);
     setShowTransactionForm(false);
-    
   };
 
   const handleCategoriaSelect = (id) => {
-    setTransactionData({ ...transactionData, categoria_id: id });
+    setTransactionData((prev) => ({ ...prev, categoria_id: id }));
     setShowCategoriaDropdown(false);
   };
 
@@ -80,16 +97,22 @@ export const DbInicio = ({ resumenFinanzas }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const ingresosMensuales = resumenFinanzas?.ingresosMensuales || [];
-  const gastosMensuales = resumenFinanzas?.gastosMensuales || [];
-  const resumenGastos = resumenFinanzas?.resumenGastos || [];
-  const resumenIngresos = resumenFinanzas?.resumenIngresos || [];
+  const ingresosMensuales = resumenFinanzas?.ingresosMensuales ?? [];
+  const gastosMensuales = resumenFinanzas?.gastosMensuales ?? [];
+  const resumenGastos = resumenFinanzas?.resumenGastos ?? [];
+  const resumenIngresos = resumenFinanzas?.resumenIngresos ?? [];
+
+  const selectedCategoria = categorias.find(cat => cat.id === parseInt(transactionData.categoria_id));
 
   return (
     <>
       <Card>
-        {ingresosMensuales.length && gastosMensuales.length ? (
-          <GraphGeneral ingresos={ingresosMensuales} gastos={gastosMensuales} />
+        {ingresosMensuales.length > 0 && gastosMensuales.length > 0 ? (
+          <GraphGeneral
+          labels={ingresosMensuales.map(item => item.mes)} 
+          ingresosData={ingresosMensuales.map(item => item.total)}
+          gastosData={gastosMensuales.map(item => item.total)}
+        />
         ) : (
           <p className="text-center text-gray-500">Cargando gráfico general...</p>
         )}
@@ -120,37 +143,30 @@ export const DbInicio = ({ resumenFinanzas }) => {
           <h2 className="text-center text-lg md:text-2xl font-bold my-4 text-black">
             {transactionType === 'Gasto' ? 'Registrar Gasto' : 'Registrar Ingreso'}
           </h2>
+
           <div className="flex flex-col space-y-4">
-           <div className="flex flex-col">
+            <div className="flex flex-col">
               <label className="text-sm md:text-base font-medium mb-1">Tipo</label>
               <input
                 value={transactionType}
                 disabled
-                className="border-2 border-dashed rounded px-2 py-1 text-sm md:text-base lg:text-lg w-full 
-                bg-white/10 font-normal cursor-not-allowed text-gray-300"
-     style={{ color: '#D1D5DB' }} 
+                className="border-2 border-dashed rounded px-2 py-1 bg-white/10 font-normal text-gray-300 cursor-not-allowed"
               />
-           </div>
+            </div>
 
             <div className="flex flex-col relative" ref={categoriaRef}>
-              <label htmlFor="categoria_id" className="text-sm md:text-base font-medium mb-1">
-                Categoría
-              </label>
+              <label className="text-sm md:text-base font-medium mb-1">Categoría</label>
               <button
                 type="button"
-                className="border-2 rounded px-2 py-2 text-sm md:text-base lg:text-lg text-left bg-white"
                 onClick={() => setShowCategoriaDropdown(!showCategoriaDropdown)}
+                className="border-2 rounded px-2 py-2 bg-white text-left"
               >
-                {transactionData.categoria_id
-                  ? `${categorias.find(cat => cat.id === parseInt(transactionData.categoria_id))?.icono || ''} ${
-                      categorias.find(cat => cat.id === parseInt(transactionData.categoria_id))?.nombre || ''
-                    }`
-                  : 'Seleccione una categoría'}
+                {selectedCategoria ? `${selectedCategoria.icono} ${selectedCategoria.nombre}` : 'Seleccione una categoría'}
               </button>
 
               {showCategoriaDropdown && (
                 <ul className="absolute z-10 mt-1 w-[80%] bg-white border border-gray-300 rounded shadow">
-                  {categorias.map((cat) => (
+                  {categorias.map(cat => (
                     <li
                       key={cat.id}
                       className="px-3 py-2 hover:bg-gray-100 cursor-pointer flex gap-2 items-center"
@@ -165,43 +181,42 @@ export const DbInicio = ({ resumenFinanzas }) => {
             </div>
 
             <div className="flex flex-col">
-              <label htmlFor="descripcion" className="text-sm md:text-base font-medium mb-1">
-                Descripción
-              </label>
+              <label className="text-sm md:text-base font-medium mb-1">Descripción</label>
               <input
-                id="descripcion"
                 name="descripcion"
                 value={transactionData.descripcion}
                 onChange={handleTransactionInputChange}
                 placeholder="Descripción"
-                className="border-2 rounded px-2 py-1 text-sm md:text-base lg:text-lg w-full"
+                className="border-2 rounded px-2 py-1 w-full"
               />
             </div>
 
             <div className="flex flex-col">
-              <label htmlFor="monto" className="text-sm md:text-base font-medium mb-1">
-                Monto
-              </label>
+              <label className="text-sm md:text-base font-medium mb-1">Monto</label>
               <input
-                id="monto"
                 name="monto"
                 type="number"
                 value={transactionData.monto}
                 onChange={handleTransactionInputChange}
-                className="border-2 rounded px-2 py-1 text-sm md:text-base lg:text-lg w-full"
+                className="border-2 rounded px-2 py-1 w-full"
               />
             </div>
           </div>
         </FormTemplate>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full mt-0.1">
-        <Card className="bg-white bg-opacity-75 p-6 rounded shadow-lg mt-1 ml-1">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full mt-2">
+        <Card className="bg-white bg-opacity-75 p-6 rounded shadow-lg">
           <div className="flex flex-col items-center justify-center w-full h-full">
             <h2 className="text-lg md:text-2xl font-bold mb-4">Resumen de Gastos</h2>
             <div className="w-full h-auto">
               {resumenGastos.length ? (
-                <GraphCircule data={resumenGastos} />
+                <GraphCircule
+                  data={resumenGastos.map(g => ({
+                    name: g.label, // Mostramos la categoría
+                    value: g.value
+                  }))}
+                />
               ) : (
                 <p className="text-center text-gray-500">No hay datos disponibles.</p>
               )}
@@ -212,7 +227,7 @@ export const DbInicio = ({ resumenFinanzas }) => {
           </div>
         </Card>
 
-        <Card className="bg-white bg-opacity-75 p-6 rounded shadow-lg mt-1 ml-1">
+        <Card className="bg-white bg-opacity-75 p-6 rounded shadow-lg">
           <div className="flex flex-col items-center justify-center w-full h-full">
             <h2 className="text-lg md:text-2xl font-bold mb-4">Transacciones</h2>
             <ul className="w-full space-y-2">
@@ -236,12 +251,17 @@ export const DbInicio = ({ resumenFinanzas }) => {
           </div>
         </Card>
 
-        <Card className="bg-white bg-opacity-75 p-6 rounded shadow-lg mt-1 ml-1">
+        <Card className="bg-white bg-opacity-75 p-6 rounded shadow-lg">
           <div className="flex flex-col items-center justify-center w-full h-full">
             <h2 className="text-lg md:text-2xl font-bold mb-4">Resumen de Ingresos</h2>
             <div className="w-full h-auto">
               {resumenIngresos.length ? (
-                <GraphCircule data={resumenIngresos} />
+                <GraphCircule
+                data={resumenIngresos.map(i => ({
+                  name: i.label,
+                  value: i.value
+               }))}
+              />
               ) : (
                 <p className="text-center text-gray-500">No hay datos disponibles.</p>
               )}
