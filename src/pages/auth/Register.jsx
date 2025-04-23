@@ -1,5 +1,5 @@
 import FormRegister from '../../components/FormRegister';
-import fondoRegistro from '../../assets/fondoRegistro.jpg';
+import fondoRegistro from '../../assets/Registro.png';
 
 const Register = () => {
   return (
