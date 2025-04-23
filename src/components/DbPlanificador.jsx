@@ -1,33 +1,67 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from './Button';
 import FormTemplate from './FormTemplate';
 import { Card } from './Card';
-import { MenuModify } from './MenuModify'; // Importar MenuModify
+import { MenuModify } from './MenuModify';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
-export const DbPlanificador = () => {
+export const DbPlanificador = ({ datosPlanificador }) => {
   const [tableData, setTableData] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [editIndex, setEditIndex] = useState(null); // null = nuevo, número = edición
   const [formData, setFormData] = useState({
     descripcion: '',
     gastosPrevistos: '',
     gastosReales: ''
   });
-  const [hoveredRowIndex, setHoveredRowIndex] = useState(null); // Estado para rastrear la fila sobre la que se pasa el cursor
+  const [hoveredRowIndex, setHoveredRowIndex] = useState(null);
+
+  useEffect(() => {
+    if (Array.isArray(datosPlanificador)) {
+      setTableData(datosPlanificador);
+    }
+  }, [datosPlanificador]);
 
   const handleAddRow = () => {
     setShowForm(true);
   };
 
-  const handleFormSubmit = (event) => {
+  const handleFormSubmit = async (event) => {
     event.preventDefault();
-    setTableData((prev) => [...prev, formData]);
-    setShowForm(false);
-    setFormData({
-      descripcion: '',
-      gastosPrevistos: '',
-      gastosReales: ''
-    });
+    const payload = {
+      id: editIndex !== null ? tableData[editIndex].id : undefined, // Añade el ID al payload
+      descripcion: formData.descripcion,
+      monto_previsto: parseFloat(formData.gastosPrevistos),
+      gastos_reales: parseFloat(formData.gastosReales),
+      diferencia: parseFloat(formData.gastosPrevistos) - parseFloat(formData.gastosReales)
+    };
+  
+    try {
+      if (editIndex !== null) {
+        // PUT request con ID en el body
+        const response = await axios.put('http://localhost:3000/dashboard/modifyExpensePlanner', payload);
+        
+        setTableData((prev) =>
+          prev.map((row, i) => (i === editIndex ? response.data : row))
+        );
+        toast.success('Gastos actualizados correctamente');
+      } else {
+        const response = await axios.post('http://localhost:3000/dashboard/addExpensePlanner', payload);
+        setTableData((prev) => [...prev, response.data]);
+        toast.success('Gastos añadidos correctamente');
+      }
+  
+      setShowForm(false);
+      setFormData({ descripcion: '', gastosPrevistos: '', gastosReales: '' });
+      setEditIndex(null);
+    } catch (error) {
+      console.error('Error en el formulario:', error);
+      toast.error('Error al guardar datos');
+    }
   };
+  
+  
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -36,13 +70,28 @@ export const DbPlanificador = () => {
 
   const handleEditRow = (index) => {
     const rowToEdit = tableData[index];
-    setFormData({ ...rowToEdit }); // Cargar los datos de la fila en el formulario
+    setFormData({ 
+      descripcion: rowToEdit.descripcion,
+      gastosPrevistos: rowToEdit.monto_previsto,
+      gastosReales: rowToEdit.gastos_reales
+    });
+    setEditIndex(index);
     setShowForm(true);
   };
 
-  const handleDeleteRow = (index) => {
-    const updatedTableData = tableData.filter((_, i) => i !== index); // Eliminar la fila localmente
-    setTableData(updatedTableData);
+  const handleDeleteRow = async (index) => {
+    const rowToDelete = tableData[index];
+    try {
+      // DELETE request con ID en el body
+      await axios.delete('http://localhost:3000/dashboard/deleteExpensePlanner', {
+        data: { id: rowToDelete.id } // Axios requiere el campo 'data' para DELETE
+      });
+      setTableData((prev) => prev.filter((_, i) => i !== index));
+      toast.success('Fila eliminada correctamente');
+    } catch (error) {
+      console.error('Error al eliminar fila:', error);
+      toast.error('Error al eliminar fila');
+    }
   };
 
   const handleMouseEnter = (index) => {
@@ -62,7 +111,7 @@ export const DbPlanificador = () => {
   return (
     <Card>
       <div>
-        <div className="overflow-x-auto md:overflow-visible w-full"> {/* Ajustar overflow y ancho */}
+        <div className="overflow-x-auto md:overflow-visible w-full">
           <table className="table-auto w-full border-collapse border border-gray-300">
             <thead>
               <tr>
@@ -75,7 +124,7 @@ export const DbPlanificador = () => {
             </thead>
             <tbody>
               {tableData.map((row, index) => {
-                const diferencia = parseFloat(row.gastosPrevistos || 0) - parseFloat(row.gastosReales || 0);
+                const diferencia = parseFloat(row.monto_previsto || 0) - parseFloat(row.gastos_reales || 0);
                 return (
                   <tr
                     key={index}
@@ -84,8 +133,8 @@ export const DbPlanificador = () => {
                     className="hover:bg-gray-100"
                   >
                     <td className="border border-gray-300 px-4 py-2">{row.descripcion}</td>
-                    <td className="border border-gray-300 px-4 py-2">{row.gastosPrevistos}</td>
-                    <td className="border border-gray-300 px-4 py-2">{row.gastosReales}</td>
+                    <td className="border border-gray-300 px-4 py-2">{row.monto_previsto}</td>
+                    <td className="border border-gray-300 px-4 py-2">{row.gastos_reales}</td>
                     <td className="border border-gray-300 px-4 py-2">{diferencia.toFixed(2)}</td>
                     <td className="border border-gray-300 px-4 py-2">
                       {hoveredRowIndex === index && (
@@ -101,13 +150,15 @@ export const DbPlanificador = () => {
             </tbody>
           </table>
         </div>
+
         <div className="flex justify-center my-4">
           <Button onClick={handleAddRow} />
         </div>
+
         {showForm && (
           <FormTemplate onSubmit={handleFormSubmit} onCancel={() => setShowForm(false)}>
-            <h2 className='text-center text-lg md:text-2xl font-bold my-4 text-black'>Agregar a la tabla</h2>
-            <div className="flex flex-col space-y-4"> {/* Cambiar a disposición vertical */}
+            <h2 className="text-center text-lg md:text-2xl font-bold my-4 text-black">Agregar a la tabla</h2>
+            <div className="flex flex-col space-y-4">
               {formStructure.map(({ name, label, type }, index) => (
                 <div key={index} className="flex flex-col">
                   <label className="text-sm md:text-base font-medium mb-1" htmlFor={name}>
