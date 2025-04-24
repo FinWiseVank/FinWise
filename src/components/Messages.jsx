@@ -30,16 +30,43 @@ export const Messages = () => {
 
   const toggleChat = () => setShowChat((prev) => !prev);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (message.trim()) {
+      const userMessage = message.trim();
+
       setChatMessages((prev) => [...prev, { text: message, sender: 'user' }]);
       setMessage('');
-      setTimeout(() => {
-        setChatMessages((prev) => [
-          ...prev,
-          { text: 'Gracias por tu mensaje. Estoy aquí para ayudarte.', sender: 'bot' },
-        ]);
-      }, 1000);
+      
+      try{
+        const response = await fetch('http://localhost:3000/dashboard/askAI', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+             // Si usas JWT o algo similar:ge, sender: 'user' }]);
+             // 'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ question: userMessage }),
+        });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            setChatMessages((prev) => [
+              ...prev,
+              { text: data.response, sender: 'bot' }, // Suponiendo que el backend responde con { response: '...' }
+            ]);
+          } else {
+            setChatMessages((prev) => [
+              ...prev,
+              { text: 'Hubo un error al procesar tu mensaje.', sender: 'bot' },
+            ]);
+            console.error('Error al enviar mensaje:', data);
+          }
+
+      }catch (error) {
+        console.error('Error al enviar el mensaje:', error);
+        setChatMessages((prev) => [...prev, { text: 'Error al obtener respuesta del bot.', sender: 'bot' }]);
+      }
     }
   };
 
