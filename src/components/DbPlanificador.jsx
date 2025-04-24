@@ -6,10 +6,10 @@ import { MenuModify } from './MenuModify';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-export const DbPlanificador = ({ datosPlanificador }) => {
+export const DbPlanificador = ({ datosPlanificador, onDataChanged }) => {
   const [tableData, setTableData] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [editIndex, setEditIndex] = useState(null); // null = nuevo, número = edición
+  const [editIndex, setEditIndex] = useState(null);
   const [formData, setFormData] = useState({
     descripcion: '',
     gastosPrevistos: '',
@@ -19,61 +19,102 @@ export const DbPlanificador = ({ datosPlanificador }) => {
 
   useEffect(() => {
     if (Array.isArray(datosPlanificador)) {
-      setTableData(datosPlanificador);
+      const formattedData = datosPlanificador.map(item => ({
+        ...item,
+        monto_previsto: item.monto_previsto ? Number(item.monto_previsto) : 0,
+        gastos_reales: item.gastos_reales ? Number(item.gastos_reales) : 0
+      }));
+      setTableData(formattedData);
     }
   }, [datosPlanificador]);
 
   const handleAddRow = () => {
+    setFormData({
+      descripcion: '',
+      gastosPrevistos: '',
+      gastosReales: ''
+    });
+    setEditIndex(null);
     setShowForm(true);
   };
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
+
+    const { descripcion, gastosPrevistos, gastosReales } = formData;
+
+    // Validación mejorada
+    if (!descripcion.trim() || gastosPrevistos === '' || gastosReales === '') {
+      toast.error('Por favor completa todos los campos.');
+      return;
+    }
+
+    const previsto = parseFloat(gastosPrevistos);
+    const real = parseFloat(gastosReales);
+
+    if (isNaN(previsto) || isNaN(real)) {
+      toast.error('Los valores de gastos deben ser números válidos.');
+      return;
+    }
+
     const payload = {
-      id: editIndex !== null ? tableData[editIndex].id : undefined, // Añade el ID al payload
-      descripcion: formData.descripcion,
-      monto_previsto: parseFloat(formData.gastosPrevistos),
-      gastos_reales: parseFloat(formData.gastosReales),
-      diferencia: parseFloat(formData.gastosPrevistos) - parseFloat(formData.gastosReales)
+      descripcion,
+      monto_previsto: previsto,
+      gastos_reales: real,
+      diferencia: previsto - real
     };
-  
+
     try {
+      let response;
       if (editIndex !== null) {
-        // PUT request con ID en el body
-        const response = await axios.put('http://localhost:3000/dashboard/modifyExpensePlanner', payload);
-        
-        setTableData((prev) =>
-          prev.map((row, i) => (i === editIndex ? response.data : row))
-        );
-        toast.success('Gastos actualizados correctamente');
+        const id = tableData[editIndex].id;
+        response = await axios.put('http://localhost:3000/dashboard/modifyExpensePlanner', {
+          ...payload,
+          id
+        });
       } else {
-        const response = await axios.post('http://localhost:3000/dashboard/addExpensePlanner', payload);
-        setTableData((prev) => [...prev, response.data]);
-        toast.success('Gastos añadidos correctamente');
+        response = await axios.post('http://localhost:3000/dashboard/addExpensePlanner', payload);
       }
-  
+
+      const updatedItem = {
+        ...response.data,
+        monto_previsto: Number(response.data.monto_previsto),
+        gastos_reales: Number(response.data.gastos_reales)
+      };
+
+      if (editIndex !== null) {
+        setTableData(prev => prev.map((row, i) => (i === editIndex ? updatedItem : row)));
+        toast.success('Gasto actualizado correctamente');
+      } else {
+        setTableData(prev => [...prev, updatedItem]);
+        toast.success('Gasto agregado correctamente');
+      }
+
       setShowForm(false);
       setFormData({ descripcion: '', gastosPrevistos: '', gastosReales: '' });
       setEditIndex(null);
+      if (onDataChanged) onDataChanged();
     } catch (error) {
       console.error('Error en el formulario:', error);
-      toast.error('Error al guardar datos');
+      toast.error(error.response?.data?.message || 'Error al guardar datos');
     }
   };
-  
-  
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setFormData({ ...formData, [name]: value });
+    // Si es un campo numérico, permitir solo números
+    const processedValue = (name === 'gastosPrevistos' || name === 'gastosReales') 
+      ? value === '' ? '' : value.replace(/[^0-9.]/g, '')
+      : value;
+    setFormData({ ...formData, [name]: processedValue });
   };
 
   const handleEditRow = (index) => {
     const rowToEdit = tableData[index];
-    setFormData({ 
-      descripcion: rowToEdit.descripcion,
-      gastosPrevistos: rowToEdit.monto_previsto,
-      gastosReales: rowToEdit.gastos_reales
+    setFormData({
+      descripcion: rowToEdit.descripcion || '',
+      gastosPrevistos: rowToEdit.monto_previsto?.toString() || '',
+      gastosReales: rowToEdit.gastos_reales?.toString() || ''
     });
     setEditIndex(index);
     setShowForm(true);
@@ -82,15 +123,15 @@ export const DbPlanificador = ({ datosPlanificador }) => {
   const handleDeleteRow = async (index) => {
     const rowToDelete = tableData[index];
     try {
-      // DELETE request con ID en el body
       await axios.delete('http://localhost:3000/dashboard/deleteExpensePlanner', {
-        data: { id: rowToDelete.id } // Axios requiere el campo 'data' para DELETE
+        data: { id: rowToDelete.id }
       });
-      setTableData((prev) => prev.filter((_, i) => i !== index));
-      toast.success('Fila eliminada correctamente');
+      setTableData(prev => prev.filter((_, i) => i !== index));
+      toast.success('Registro eliminado correctamente');
+      if (onDataChanged) onDataChanged();
     } catch (error) {
-      console.error('Error al eliminar fila:', error);
-      toast.error('Error al eliminar fila');
+      console.error('Error al eliminar registro:', error);
+      toast.error(error.response?.data?.message || 'Error al eliminar registro');
     }
   };
 
@@ -104,8 +145,8 @@ export const DbPlanificador = ({ datosPlanificador }) => {
 
   const formStructure = [
     { name: 'descripcion', label: 'Descripción', type: 'text' },
-    { name: 'gastosPrevistos', label: 'Gastos Previstos', type: 'text' },
-    { name: 'gastosReales', label: 'Gastos Reales', type: 'text' }
+    { name: 'gastosPrevistos', label: 'Gastos Previstos', type: 'text', inputMode: 'decimal' },
+    { name: 'gastosReales', label: 'Gastos Reales', type: 'text', inputMode: 'decimal' }
   ];
 
   return (
@@ -124,7 +165,7 @@ export const DbPlanificador = ({ datosPlanificador }) => {
             </thead>
             <tbody>
               {tableData.map((row, index) => {
-                const diferencia = parseFloat(row.monto_previsto || 0) - parseFloat(row.gastos_reales || 0);
+                const diferencia = (row.monto_previsto || 0) - (row.gastos_reales || 0);
                 return (
                   <tr
                     key={index}
@@ -133,14 +174,14 @@ export const DbPlanificador = ({ datosPlanificador }) => {
                     className="hover:bg-gray-100"
                   >
                     <td className="border border-gray-300 px-4 py-2">{row.descripcion}</td>
-                    <td className="border border-gray-300 px-4 py-2">{row.monto_previsto}</td>
-                    <td className="border border-gray-300 px-4 py-2">{row.gastos_reales}</td>
-                    <td className="border border-gray-300 px-4 py-2">{diferencia.toFixed(2)}</td>
+                    <td className="border border-gray-300 px-4 py-2">${(row.monto_previsto || 0).toFixed(2)}</td>
+                    <td className="border border-gray-300 px-4 py-2">${(row.gastos_reales || 0).toFixed(2)}</td>
+                    <td className="border border-gray-300 px-4 py-2">${diferencia.toFixed(2)}</td>
                     <td className="border border-gray-300 px-4 py-2">
                       {hoveredRowIndex === index && (
-                        <MenuModify 
-                          onEdit={() => handleEditRow(index)} 
-                          onDelete={() => handleDeleteRow(index)} 
+                        <MenuModify
+                          onEdit={() => handleEditRow(index)}
+                          onDelete={() => handleDeleteRow(index)}
                         />
                       )}
                     </td>
@@ -157,9 +198,11 @@ export const DbPlanificador = ({ datosPlanificador }) => {
 
         {showForm && (
           <FormTemplate onSubmit={handleFormSubmit} onCancel={() => setShowForm(false)}>
-            <h2 className="text-center text-lg md:text-2xl font-bold my-4 text-black">Agregar a la tabla</h2>
+            <h2 className="text-center text-lg md:text-2xl font-bold my-4 text-black">
+              {editIndex !== null ? 'Editar gasto' : 'Agregar gasto'}
+            </h2>
             <div className="flex flex-col space-y-4">
-              {formStructure.map(({ name, label, type }, index) => (
+              {formStructure.map(({ name, label, type, inputMode }, index) => (
                 <div key={index} className="flex flex-col">
                   <label className="text-sm md:text-base font-medium mb-1" htmlFor={name}>
                     {label}
@@ -167,6 +210,7 @@ export const DbPlanificador = ({ datosPlanificador }) => {
                   <input
                     id={name}
                     type={type}
+                    inputMode={inputMode}
                     placeholder={label}
                     name={name}
                     value={formData[name]}
