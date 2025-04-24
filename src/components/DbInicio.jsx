@@ -71,7 +71,7 @@ export const DbInicio = ({ resumenFinanzas, transacciones }) => {
       await fetchDashboardData();
     } catch (error) {
       console.error('Error al enviar transacción:', error);
-      alert('Error al registrar la transacción');
+      //alert('Error al registrar la transacción');
     } finally {
       setShowTransactionForm(false);
       setTransactionData({ descripcion: '', monto: '', categoria_id: '' });
