@@ -7,7 +7,7 @@ import FormTemplate from './FormTemplate';
 import GraphCircule from './GraphCircule';
 import axios from 'axios';
 
-export const DbInicio = ({ resumenFinanzas }) => {
+export const DbInicio = ({ resumenFinanzas, transacciones }) => {
   const [showSubmenu, setShowSubmenu] = useState(false);
   const [showTransactionForm, setShowTransactionForm] = useState(false);
   const [transactionType, setTransactionType] = useState('');
@@ -27,6 +27,7 @@ export const DbInicio = ({ resumenFinanzas }) => {
     setTransactionType(type);
     setShowTransactionForm(true);
     try {
+      //const response = await axios.get('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/getCategory?tipo=${type.toLowerCase()}`);
       const response = await axios.get(`http://localhost:3000/dashboard/getCategory?tipo=${type.toLowerCase()}`);
       setCategorias(response.data.data || []);
     } catch (error) {
@@ -59,6 +60,7 @@ export const DbInicio = ({ resumenFinanzas }) => {
         tipo: transactionType.toLowerCase(),
         fecha: new Date().toISOString()
       };
+      //await axios.post('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/addTransactions', nuevaTransaccion);
       await axios.post('http://localhost:3000/dashboard/addTransactions', nuevaTransaccion);
       toast.success('Transacción registrada exitosamente', {
         theme: 'colored',
@@ -221,7 +223,7 @@ export const DbInicio = ({ resumenFinanzas }) => {
                 <p className="text-center text-gray-500">No hay datos disponibles.</p>
               )}
             </div>
-            <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:scale-105 hover:bg-blue-600 transition">
+            <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:scale-105 hover:bg-blue-600 transition cursor-pointer">
               Ver Resumen
             </button>
           </div>
@@ -231,22 +233,18 @@ export const DbInicio = ({ resumenFinanzas }) => {
           <div className="flex flex-col items-center justify-center w-full h-full">
             <h2 className="text-lg md:text-2xl font-bold mb-4">Transacciones</h2>
             <ul className="w-full space-y-2">
-              <li className="flex justify-between border-b pb-2">
-                <span>Compra en supermercado</span>
-                <span className="text-red-500">- $50</span>
-              </li>
-              <li className="flex justify-between border-b pb-2">
-                <span>Pago de salario</span>
-                <span className="text-green-500">+ $1000</span>
-              </li>
-              <li className="flex justify-between border-b pb-2">
-                <span>Transporte</span>
-                <span className="text-red-500">- $20</span>
-              </li>
-              <li className="flex justify-between">
-                <span>Freelance</span>
-                <span className="text-green-500">+ $500</span>
-              </li>
+              {transacciones?.length ? (
+                transacciones.map((t) => (
+                  <li key={t.id} className="flex justify-between border-b pb-2">
+                    <span>{t.descripcion}</span>
+                    <span className={t.tipo === 'gasto' ? 'text-red-500' : 'text-green-500'}>
+                      {t.tipo === 'gasto' ? '-' : '+'} ${parseFloat(t.monto).toFixed(2)}
+                    </span>
+                  </li>
+                ))
+              ) : (
+                <p className="text-center text-gray-500">No hay transacciones registradas.</p>
+              )}
             </ul>
           </div>
         </Card>
@@ -266,7 +264,7 @@ export const DbInicio = ({ resumenFinanzas }) => {
                 <p className="text-center text-gray-500">No hay datos disponibles.</p>
               )}
             </div>
-            <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:scale-105 hover:bg-blue-600 transition">
+            <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:scale-105 hover:bg-blue-600 transition cursor-pointer">
               Ver Resumen
             </button>
           </div>

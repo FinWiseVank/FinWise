@@ -48,8 +48,8 @@ const Dashboard = () => {
   };
 
   const contentMap = {
-    inicio: <DbInicio  resumenFinanzas={data?.resumenFinanzas}onTransactionAdded={triggerRefresh}/>,
-    planificador: <DbPlanificador planificador={data?.planificador} />,
+    inicio: <DbInicio  resumenFinanzas={data?.resumenFinanzas}onTransactionAdded={triggerRefresh}transacciones={data?.transacciones}/>,
+    planificador: <DbPlanificador datosPlanificador={data?.planificador}onDataChanged={triggerRefresh} />,
     'añadir-Metas': <DbAñadirMetas metas={data?.metas} />,
     'añadir-Recordatorios': <DbAñadirRecordatorio recordatorios={data?.recordatorios} />
   };
