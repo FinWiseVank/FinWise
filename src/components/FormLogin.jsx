@@ -45,7 +45,7 @@ const Form = () => {
             });
 
              // Redirige a una página protegida (ej. Dashboard)
-             navigate("/dashboard");
+             navigate("/dashboard"); 
         } catch (error) {
             toast.error(error.response?.data?.error || 'Error al iniciar sesión', {
                 theme: "colored",
