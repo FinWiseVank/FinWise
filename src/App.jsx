@@ -5,21 +5,27 @@ import RestaurarContraseña from "./pages/auth/RestaurarContraseña"
 import Dashboard from "./pages/Dashboard"
 import NotFound from "./pages/NotFound"
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import PrivateRoute from "./components/PrivateRoute";
 
 const App = () => {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route index element={<HomePage />} /> 
-        <Route path="/iniciar-sesion" element={<Login />} />
-        <Route path="/registro" element={<Register />} />
-        <Route path="/restaurar-contraseña" element={<RestaurarContraseña />} />
-        <Route path="/404" element={<NotFound />} />
-        <Route path="/dashboard" element={ <Dashboard /> } />
+    <AuthProvider>
 
-      </Routes>
+      <BrowserRouter>
+        <Routes>
+          <Route index element={<HomePage />} /> 
+          <Route path="/iniciar-sesion" element={<Login />} />
+          <Route path="/registro" element={<Register />} />
+          <Route path="/restaurar-contraseña" element={<RestaurarContraseña />} />
+          <Route path="/404" element={<NotFound />} />
+          <Route path="/dashboard" element={ <PrivateRoute> <Dashboard/> </PrivateRoute>} />
 
-    </BrowserRouter> 
+        </Routes>
+
+      </BrowserRouter> 
+    </AuthProvider>
+
     
   )
 }

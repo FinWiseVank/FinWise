@@ -1,9 +1,13 @@
 import React, {useState} from 'react';
-import {Link} from  "react-router-dom";
+import {Link, useNavigate} from  "react-router-dom";
 import {toast} from 'react-toastify'; 
 import axios from 'axios';
 
+
 const Form = () => {
+
+    const navigate = useNavigate();
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -29,11 +33,19 @@ const Form = () => {
         try {
            // const response = await axios.post('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/user/login', { email, contrasenia: password });
            const response = await axios.post('http://localhost:3000/user/login', { email, contrasenia: password }); 
+           
+           const { token } = response.data;
+           //Almacena el token en el localStorage
+            localStorage.setItem('token', token);
+
+            //muestra un mensaje de éxito
            toast.success('Inicio de sesión exitoso', {
                 theme: "colored",
                 position: "top-center",
             });
-            console.log(response.data);
+
+             // Redirige a una página protegida (ej. Dashboard)
+             navigate("/dashboard");
         } catch (error) {
             toast.error(error.response?.data?.error || 'Error al iniciar sesión', {
                 theme: "colored",
