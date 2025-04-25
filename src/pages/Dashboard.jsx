@@ -1,5 +1,5 @@
 // Dashboard.jsx
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect, useRef } from 'react'; 
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { DbInicio } from '../components/DbInicio';
@@ -7,15 +7,21 @@ import { DbPlanificador } from '../components/DbPlanificador';
 import { DbAñadirMetas } from '../components/DbAñadirMetas';
 import { DbAñadirRecordatorio } from '../components/DbAñadirRecordatorio';
 import { FaDollarSign } from "react-icons/fa6";
+import { FaBell } from "react-icons/fa"; // Importa el ícono de campana
 import { Messages } from '../components/Messages';
 import UserName from '../components/UserName';
 import logo from '../assets/FinWise_logo.png'; // Asegúrate de que la ruta sea correcta
+import { toast } from 'react-toastify';
 
 const Dashboard = () => {
   const [data, setData] = useState(null);
   const [activeContent, setActiveContent] = useState('inicio');
   const [refreshTrigger, setRefreshTrigger] = useState(0); // Añadir estado para refrescar
+  const [notificaciones, setNotificaciones] = useState([]);
+  const [nuevasNotificaciones, setNuevasNotificaciones] = useState(false);
+  const [mostrarDropdown, setMostrarDropdown] = useState(false);
   const navigate = useNavigate();
+  const dropdownRef = useRef(null);
 
   const fetchData = async () => {
     try {
@@ -27,13 +33,52 @@ const Dashboard = () => {
     }
   };
 
+  const fetchNotificaciones = async () => {
+    try {
+      const res = await axios.get('http://localhost:3000/dashboard/notificaciones');
+      setNotificaciones(res.data.notificaciones || []); // Maneja un array vacío si no hay notificaciones
+      setNuevasNotificaciones(res.data.notificaciones.some(notif => !notif.leida)); // Marca como nuevas si hay alguna no leída
+    } catch (error) {
+      console.error('Error al obtener las notificaciones:', error);
+      toast.error('Error al cargar notificaciones');
+    }
+  };
+
   useEffect(() => {
     fetchData();
+    fetchNotificaciones(); // Asegúrate de llamar a esta función para cargar las notificaciones
   }, [refreshTrigger]); // Añadir refreshTrigger como dependencia
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setMostrarDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Función para forzar actualización
   const triggerRefresh = () => {
     setRefreshTrigger(prev => prev + 1);
+  };
+
+  const marcarComoLeidas = async () => {
+    try {
+      await axios.post('http://localhost:3000/dashboard/notificaciones/marcar-leidas');
+      setNuevasNotificaciones(false); // Desactiva la animación
+      fetchNotificaciones(); // Actualiza las notificaciones
+    } catch (error) {
+      console.error('Error al marcar notificaciones como leídas:', error);
+    }
+  };
+
+  const toggleDropdown = () => {
+    if (nuevasNotificaciones) {
+      marcarComoLeidas();
+    }
+    setMostrarDropdown(!mostrarDropdown);
   };
 
   const handleLogout = async () => {
@@ -50,8 +95,8 @@ const Dashboard = () => {
   const contentMap = {
     inicio: <DbInicio  resumenFinanzas={data?.resumenFinanzas}onTransactionAdded={triggerRefresh}transacciones={data?.transacciones}/>,
     planificador: <DbPlanificador datosPlanificador={data?.planificador}onDataChanged={triggerRefresh} />,
-    'añadir-Metas': <DbAñadirMetas metas={data?.metas} />,
-    'añadir-Recordatorios': <DbAñadirRecordatorio recordatorios={data?.recordatorios} />
+    'añadir-Metas': <DbAñadirMetas metas={data?.metas}onDataChanged={triggerRefresh} />,
+    'añadir-Recordatorios': <DbAñadirRecordatorio recordatorios={data?.recordatorios}onRecordatorioAdded={triggerRefresh} />
   };
 
   // Formateador de moneda COP
@@ -86,6 +131,37 @@ const Dashboard = () => {
           </ul>
         </nav>
         <div className="flex items-center space-x-4">
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={toggleDropdown}
+              className="relative text-gray-700 hover:text-gray-900 cursor-pointer"
+            >
+              <FaBell className={`text-2xl ${nuevasNotificaciones ? 'animate-bounce' : ''}`} />
+              {nuevasNotificaciones && (
+                <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full"></span>
+              )}
+            </button>
+            {mostrarDropdown && (
+              <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-300 rounded shadow-lg cursor-pointer">
+                <ul className="divide-y divide-gray-200">
+                  {notificaciones.length > 0 ? (
+                    notificaciones.map((notificacion, index) => (
+                      <li
+                        key={index}
+                        className={`p-2 hover:bg-gray-100 ${
+                          notificacion.leida ? 'bg-gray-200 text-gray-500' : 'bg-blue-100 text-blue-800'
+                        }`}
+                      >
+                        {notificacion.mensaje}
+                      </li>
+                    ))
+                  ) : (
+                    <li className="p-2 text-gray-500">No hay notificaciones</li>
+                  )}
+                </ul>
+              </div>
+            )}
+          </div>
           <UserName nombreUsuario={data?.nombreUsuario}/>
           <button 
             onClick={handleLogout} 
