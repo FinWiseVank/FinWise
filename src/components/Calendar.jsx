@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import axios from 'axios';
 import FormTemplate from './FormTemplate';
 import { toast } from 'react-toastify';
+import { FaTrash } from "react-icons/fa"; // Importar el ícono de bote de basura
 
 dayjs.locale('es');
 const localizer = dayjsLocalizer(dayjs);
@@ -187,7 +188,7 @@ export const Calendar = ({ recordatorios = [], onRecordatorioAdded }) => {
               Evento seleccionado: <span className="font-bold">{selectedEvent.title}</span>
             </p>
           )}
-          <label className="block text-white text-lg font-bold mb-2" htmlFor="title">
+          <label className="block text-white text-lg font-bold mb-1" htmlFor="title">
             Título del evento
           </label>
           <input
@@ -199,7 +200,7 @@ export const Calendar = ({ recordatorios = [], onRecordatorioAdded }) => {
             onChange={handleInputChange}
             className="border-2 rounded px-4 py-2 mb-6 text-lg bg-blue-50"
           />
-          <label className="block text-white text-lg font-bold mb-2" htmlFor="start">
+          <label className="block text-white text-lg font-bold mb-1" htmlFor="start">
             Fecha y hora de inicio
           </label>
           <input
@@ -210,7 +211,7 @@ export const Calendar = ({ recordatorios = [], onRecordatorioAdded }) => {
             onChange={handleInputChange}
             className="border-2 rounded px-4 py-2 mb-6 text-lg bg-green-50"
           />
-          <label className="block text-white text-lg font-bold mb-2" htmlFor="end">
+          <label className="block text-white text-lg font-bold mb-1" htmlFor="end">
             Fecha y hora de fin
           </label>
           <input
@@ -225,9 +226,9 @@ export const Calendar = ({ recordatorios = [], onRecordatorioAdded }) => {
             <button
               type="button"
               onClick={handleDeleteEvent}
-              className="bg-red-500 text-white px-6 py-3 rounded hover:bg-red-600 text-lg"
+              className="flex items-center justify-center bg-red-500 text-white p-3 rounded-full hover:bg-red-600 mb-6"
             >
-              Eliminar Evento
+              <FaTrash className="text-xl" />
             </button>
           )}
         </FormTemplate>

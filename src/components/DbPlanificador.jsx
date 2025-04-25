@@ -174,9 +174,9 @@ export const DbPlanificador = ({ datosPlanificador, onDataChanged }) => {
                     className="hover:bg-gray-100"
                   >
                     <td className="border border-gray-300 px-4 py-2">{row.descripcion}</td>
-                    <td className="border border-gray-300 px-4 py-2">${(row.monto_previsto || 0).toFixed(2)}</td>
-                    <td className="border border-gray-300 px-4 py-2">${(row.gastos_reales || 0).toFixed(2)}</td>
-                    <td className="border border-gray-300 px-4 py-2">${diferencia.toFixed(2)}</td>
+                    <td className="border border-gray-300 px-4 py-2">${parseFloat(row.monto_previsto || 0).toString()}</td>
+                    <td className="border border-gray-300 px-4 py-2">${parseFloat(row.gastos_reales || 0).toString()}</td>
+                    <td className="border border-gray-300 px-4 py-2">${parseFloat(diferencia).toString()}</td>
                     <td className="border border-gray-300 px-4 py-2">
                       {hoveredRowIndex === index && (
                         <MenuModify
