@@ -6,6 +6,8 @@ import { FaBox } from "react-icons/fa";
 import { MenuModify } from './MenuModify';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { confirmAlert } from 'react-confirm-alert'; // Asegúrate de instalar react-confirm-alert
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Estilos predeterminados
 
 export const DbAñadirMetas = ({ metas, onDataChanged }) => {
   const [showForm, setShowForm] = useState(false);
@@ -36,29 +38,52 @@ export const DbAñadirMetas = ({ metas, onDataChanged }) => {
     const metaToEdit = metas[index];
     setFormData({ 
       ...metaToEdit,
-      fechaLimite: metaToEdit.fechaLimite.split('T')[0],
-      montoActual: metaToEdit.montoActual.toString()
+      fechaLimite: metaToEdit.fecha_limite.split('T')[0],
+      montoActual: metaToEdit.monto_actual.toString()
     });
     setFormMode('update');
     setShowForm(true);
   };
 
   const handleDeleteMeta = async (index) => {
-    if (!window.confirm('¿Estás seguro de eliminar esta meta?')) return;
-    
     const metaToDelete = metas[index];
-    
-    try {
-      await axios.delete('http://localhost:3000/dashboard/deleteGoal', {
-        data: { id: metaToDelete.id }
-      });
-      
-      toast.success('Meta eliminada correctamente');
-      onDataChanged?.();
-    } catch (error) {
-      console.error('Error al eliminar meta:', error);
-      toast.error(error.response?.data?.message || 'Error al eliminar meta');
-    }
+    confirmAlert({
+      customUI: ({ onClose }) => (
+        <div className="bg-white p-6 rounded-lg shadow-lg border-2 border-blue-500">
+          <h1 className="text-2xl font-bold text-blue-600">Confirmar eliminación</h1>
+          <p className="mt-4 text-gray-700">
+            ¿Estás seguro de eliminar la meta <span className="font-semibold">{metaToDelete.nombre}</span>?
+          </p>
+          <div className="mt-6 flex justify-end space-x-4">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={async () => {
+                try {
+                  await axios.delete('http://localhost:3000/dashboard/deleteGoal', {
+                    data: { id: metaToDelete.meta_id } // Asegurarse de enviar el ID con la clave correcta
+                  });
+                  toast.success('Meta eliminada correctamente');
+                  onDataChanged?.(); // Refrescar datos después de la eliminación
+                } catch (error) {
+                  console.error('Error al eliminar meta:', error);
+                  toast.error(error.response?.data?.message || 'Error al eliminar meta');
+                } finally {
+                  onClose();
+                }
+              }}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Eliminar
+            </button>
+          </div>
+        </div>
+      )
+    });
   };
 
   const handleFormSubmit = async (event) => {
@@ -73,8 +98,8 @@ export const DbAñadirMetas = ({ metas, onDataChanged }) => {
         }
 
         const montoFinal = parseFloat(formData.montoFinal);
-        if (isNaN(montoFinal) || montoFinal <= 0) {
-          throw new Error('Monto objetivo inválido');
+        if (isNaN(montoFinal) || montoFinal < 1000) { // Permitir valores mayores o iguales a 1000
+          throw new Error('Monto objetivo debe ser mayor o igual a 1000');
         }
 
         const payload = {
@@ -93,7 +118,7 @@ export const DbAñadirMetas = ({ metas, onDataChanged }) => {
         }
 
         await axios.put('http://localhost:3000/dashboard/modifyGoal', {
-          meta_id: formData.id,
+          meta_id: formData.meta_id,
           monto_actual: montoActual
         });
         toast.success('¡Ahorro actualizado!');
@@ -128,11 +153,14 @@ export const DbAñadirMetas = ({ metas, onDataChanged }) => {
 
   // Calcular progreso
   const calcularProgreso = (meta) => {
-    const progreso = (meta.montoActual / meta.montoFinal) * 100;
+    const montoActual = parseFloat(meta.monto_actual) || 0; // Validar monto_actual
+    const montoFinal = parseFloat(meta.monto_objetivo) || 1; // Evitar división por 0
+    const progreso = (montoActual / montoFinal) * 100;
+
     return {
       porcentaje: Math.min(progreso, 100),
       estado: progreso >= 100 ? 'Completado' : 'En progreso',
-      clase: progreso >= 100 ? 'bg-green-500' : 'bg-blue-500'
+      clase: progreso >= 100 ? 'bg-green-500' : 'bg-blue-500',
     };
   };
 
@@ -149,17 +177,22 @@ export const DbAñadirMetas = ({ metas, onDataChanged }) => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         {metas?.map((meta, index) => {
+          if (!meta || !meta.meta_id) { // Cambiar validación para usar meta.meta_id
+            console.warn(`Meta inválida en el índice ${index}:`, meta);
+            return null; // Ignorar metas inválidas
+          }
+
           const { porcentaje, estado, clase } = calcularProgreso(meta);
           return (
             <div
-              key={meta.id}
+              key={meta.meta_id} // Usar meta.meta_id como key única
               className="relative group"
               onMouseEnter={() => handleMouseEnter(index)}
               onMouseLeave={handleMouseLeave}
             >
               <Box className="h-full">
                 <div className="flex justify-between items-start">
-                  <h3 className="font-bold text-lg">{meta.titulo}</h3>
+                  <h3 className="font-bold text-lg">{meta.nombre || 'Sin título'}</h3>
                   <span className={`text-xs px-2 py-1 rounded-full ${
                     estado === 'Completado' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
                   }`}>
@@ -170,15 +203,15 @@ export const DbAñadirMetas = ({ metas, onDataChanged }) => {
                 <div className="mt-3 space-y-1">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500">Objetivo:</span>
-                    <span className="font-medium">${meta.montoFinal.toLocaleString()}</span>
+                    <span className="font-medium">${(meta.monto_objetivo || 0).toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500">Ahorrado:</span>
-                    <span className="font-medium">${meta.montoActual.toLocaleString()}</span>
+                    <span className="font-medium">${(meta.monto_actual || 0).toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500">Fecha límite:</span>
-                    <span>{new Date(meta.fechaLimite).toLocaleDateString()}</span>
+                    <span>{meta.fecha_limite ? new Date(meta.fecha_limite).toLocaleDateString() : 'Sin fecha'}</span>
                   </div>
                 </div>
 
@@ -191,13 +224,13 @@ export const DbAñadirMetas = ({ metas, onDataChanged }) => {
                   </div>
                   <div className="flex justify-between text-xs text-gray-500 mt-1">
                     <span>{porcentaje.toFixed(0)}% completado</span>
-                    <span>${(meta.montoFinal - meta.montoActual).toLocaleString()} restantes</span>
+                    <span>${((meta.monto_objetivo || 0) - (meta.monto_actual || 0)).toLocaleString()} restantes</span>
                   </div>
                 </div>
               </Box>
 
               {hoveredMetaIndex === index && (
-                <div className="absolute inset-0 bg-black bg-opacity-10 rounded-lg flex items-center justify-center">
+                <div className="absolute inset-0  rounded-lg flex items-center justify-center">
                   <MenuModify 
                     onEdit={() => handleEditMeta(index)} 
                     onDelete={() => handleDeleteMeta(index)} 
@@ -255,8 +288,8 @@ export const DbAñadirMetas = ({ metas, onDataChanged }) => {
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border rounded-md"
                     placeholder="Ej: 5000000"
-                    min="1"
-                    step="10000"
+                    min="1000" // Cambiar validación mínima a 1000
+                    step="100"
                     required
                     disabled={isLoading}
                   />
@@ -281,7 +314,7 @@ export const DbAñadirMetas = ({ metas, onDataChanged }) => {
                 <div className="bg-gray-50 p-3 rounded-md mb-3">
                   <h3 className="font-semibold">{formData.titulo}</h3>
                   <div className="flex justify-between text-sm mt-1">
-                    <span>Objetivo: ${parseFloat(formData.montoFinal).toLocaleString()}</span>
+                    <span>Objetivo: ${parseFloat(formData.montoFinal || 0).toLocaleString()}</span> {/* Asegurar que montoFinal sea un número */}
                     <span>Fecha: {new Date(formData.fechaLimite).toLocaleDateString()}</span>
                   </div>
                 </div>

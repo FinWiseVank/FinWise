@@ -87,7 +87,7 @@ export const Messages = () => {
               <h2 className="text-lg font-bold">Chatbot</h2>
               <button 
                 onClick={toggleChat}
-                className="text-white hover:text-gray-200 focus:outline-none"
+                className="text-white hover:text-gray-200 focus:outline-none cursor-pointer"
                 aria-label="Cerrar chat"
               >
                 <FaTimes />
@@ -147,7 +147,7 @@ export const Messages = () => {
       <div className="fixed bottom-6 right-6 z-[9999]">
         <button 
           onClick={toggleChat}
-          className="p-4 bg-blue-500 text-white rounded-full shadow-lg transition-transform hover:scale-110 hover:bg-blue-600 focus:outline-none"
+          className="p-4 bg-blue-500 text-white rounded-full shadow-lg transition-transform hover:scale-110 hover:bg-blue-600 focus:outline-none cursor-pointer"
           aria-label={showChat ? "Cerrar chat" : "Abrir chat"}
         >
           {showChat ? <FaTimes /> : <FaComments />}
