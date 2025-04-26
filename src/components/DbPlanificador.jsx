@@ -78,8 +78,9 @@ export const DbPlanificador = ({ datosPlanificador, onDataChanged }) => {
 
       const updatedItem = {
         ...response.data,
-        monto_previsto: Number(response.data.monto_previsto),
-        gastos_reales: Number(response.data.gastos_reales)
+        monto_previsto: Number(response.data.monto_previsto || 0),
+        gastos_reales: Number(response.data.gastos_reales || 0),
+        diferencia: Number(response.data.monto_previsto || 0) - Number(response.data.gastos_reales || 0),
       };
 
       if (editIndex !== null) {
