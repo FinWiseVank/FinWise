@@ -8,6 +8,7 @@ import { DbAñadirMetas } from '../components/DbAñadirMetas';
 import { DbAñadirRecordatorio } from '../components/DbAñadirRecordatorio';
 import { FaDollarSign } from "react-icons/fa6";
 import { FaBell } from "react-icons/fa"; // Importa el ícono de campana
+import { FaSignOutAlt } from "react-icons/fa"; // Importar el ícono de cerrar sesión
 import { Messages } from '../components/Messages';
 import UserName from '../components/UserName';
 import logo from '../assets/FinWise_logo.png'; // Asegúrate de que la ruta sea correcta
@@ -20,11 +21,11 @@ const Dashboard = () => {
   const [notificaciones, setNotificaciones] = useState([]);
   const [nuevasNotificaciones, setNuevasNotificaciones] = useState(false);
   const [mostrarDropdown, setMostrarDropdown] = useState(false);
+  const [loading, setLoading] = useState(true); // Nuevo estado de carga
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
 
   const fetchData = async () => {
-    
     try {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -37,10 +38,10 @@ const Dashboard = () => {
       });
       console.log('Datos del dashboard:', res.data);
       setData(res.data.data);
-
-      
+      setLoading(false); // Finaliza la carga cuando los datos están disponibles
     } catch (error) {
       console.error('Error al obtener los datos del dashboard:', error);
+      setLoading(false); // Finaliza la carga incluso si hay un error
     }
   };
 
@@ -182,28 +183,29 @@ const Dashboard = () => {
           <UserName nombreUsuario={data?.nombreUsuario}/>
           <button 
             onClick={handleLogout} 
-            className="px-5 py-2 bg-red-500 text-white rounded-3xl hover:bg-red-600 transition-transform transform hover:scale-105"
+            className="px-5 py-2 bg-red-500 text-white rounded-3xl hover:bg-red-600 transition-transform transform hover:scale-105 flex items-center justify-center cursor-pointer"
           >
-            Cerrar Sesión
+            <FaSignOutAlt size={20} /> {/* Ícono de cerrar sesión */}
           </button>
         </div>
       </header>
 
       <main className='mt-[4rem] md:mt-[5rem] p-4 md:p-8 bg-[#E5E7EB] min-h-screen w-full'>
-      <div className='flex items-center'>
-  <p className='text-2xl md:text-3xl font-medium '>Balance:</p>
-  {!data ? (
-    <p className="text-gray-600 text-2xl md:text-3xl font-medium">Cargando...</p>
-  ) : (
-    <p className="text-2xl md:text-3xl font-medium text-blue-700 ml-2">
-      {formatter.format(data.resumenFinanzas?.balance ?? 0)}
-    </p>
-  )}
-</div>
-
-
-
-        {contentMap[activeContent]}
+        {loading ? ( // Mostrar indicador de carga mientras se obtienen los datos
+          <div className="flex justify-center items-center h-full">
+            <p className="text-gray-600 text-2xl">Cargando datos...</p>
+          </div>
+        ) : (
+          <>
+            <div className='flex items-center'>
+              <p className='text-2xl md:text-3xl font-medium '>Balance:</p>
+              <p className="text-2xl md:text-3xl font-medium text-blue-700 ml-2">
+                {formatter.format(data?.resumenFinanzas?.balance ?? 0)}
+              </p>
+            </div>
+            {contentMap[activeContent]}
+          </>
+        )}
       </main>
 
       <div className='fixed bottom-4 right-4'>
