@@ -22,6 +22,7 @@ export const DbAñadirMetas = ({ metas, onDataChanged }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [formMode, setFormMode] = useState('create');
   const [localMetas, setLocalMetas] = useState([]);
+  
 
   useEffect(() => {
     setLocalMetas(metas); // Actualizar datos locales cuando cambien las metas
@@ -96,7 +97,14 @@ export const DbAñadirMetas = ({ metas, onDataChanged }) => {
     event.preventDefault();
     setIsLoading(true);
 
+
     try {
+
+      const userId = localStorage.getItem('userId'); // 👈 obtenemos el ID del usuario
+      if (!userId) {
+        throw new Error('Usuario no autenticado');
+      }
+
       if (formMode === 'create') {
         // Validación creación
         if (!formData.titulo.trim() || !formData.fechaLimite || !formData.montoFinal) {
@@ -109,6 +117,7 @@ export const DbAñadirMetas = ({ metas, onDataChanged }) => {
         }
 
         const payload = {
+          usuario_id: userId, 
           titulo: formData.titulo.trim(),
           fecha_limite: formData.fechaLimite,
           monto_objetivo: montoFinal
