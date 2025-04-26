@@ -49,7 +49,7 @@ const Form = () => {
                 position: "top-center",
             });
 
-             // Redirige a una página protegida (ej. Dashboard)
+             // Redirige a una página protegida 
              navigate("/dashboard"); 
         } catch (error) {
             toast.error(error.response?.data?.error || 'Error al iniciar sesión', {
@@ -73,6 +73,11 @@ const Form = () => {
         // 2. Intentar recuperar el token de localStorage al cargar la app
         const token = localStorage.getItem('token');
 
+        if (token) {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        } else {
+            delete axios.defaults.headers.common['Authorization']; // Eliminar el token si no existe
+        }
         setAuthToken(token); // Establece el token en axios
         validarToken();
 
