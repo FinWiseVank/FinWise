@@ -57,11 +57,16 @@ export const DbPlanificador = ({ datosPlanificador, onDataChanged }) => {
       return;
     }
 
+    const userData = JSON.parse(localStorage.getItem('user')); // o como recuperes tu usuario
+    const usuarioId = userData?.id;
+
     const payload = {
       descripcion,
       monto_previsto: previsto,
       gastos_reales: real,
-      diferencia: previsto - real
+      diferencia: previsto - real,
+      usuario_id: usuarioId
+
     };
 
     try {
