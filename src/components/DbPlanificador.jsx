@@ -16,6 +16,7 @@ export const DbPlanificador = ({ datosPlanificador, onDataChanged }) => {
     gastosReales: ''
   });
   const [hoveredRowIndex, setHoveredRowIndex] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (Array.isArray(datosPlanificador)) {
@@ -40,36 +41,39 @@ export const DbPlanificador = ({ datosPlanificador, onDataChanged }) => {
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
-
-    const { descripcion, gastosPrevistos, gastosReales } = formData;
-
-    // Validación mejorada
-    if (!descripcion.trim() || gastosPrevistos === '' || gastosReales === '') {
-      toast.error('Por favor completa todos los campos.');
-      return;
-    }
-
-    const previsto = parseFloat(gastosPrevistos);
-    const real = parseFloat(gastosReales);
-
-    if (isNaN(previsto) || isNaN(real)) {
-      toast.error('Los valores de gastos deben ser números válidos.');
-      return;
-    }
-
-    const userData = JSON.parse(localStorage.getItem('user')); // o como recuperes tu usuario
-    const usuarioId = userData?.id;
-
-    const payload = {
-      descripcion,
-      monto_previsto: previsto,
-      gastos_reales: real,
-      diferencia: previsto - real,
-      usuario_id: usuarioId
-
-    };
+    setIsLoading(true);
 
     try {
+      const token = localStorage.getItem('token'); // Obtener el token del almacenamiento local
+      if (!token) {
+        throw new Error('Usuario no autenticado. Por favor, inicie sesión nuevamente.');
+      }
+
+      const userId = JSON.parse(atob(token.split('.')[1])).id; // Decodificar el token para obtener el userId
+      if (!userId) {
+        throw new Error('Usuario no autenticado. Por favor, inicie sesión nuevamente.');
+      }
+
+      // Validar los datos del formulario antes de enviarlos
+      if (!formData.descripcion.trim() || !formData.gastosPrevistos || !formData.gastosReales) {
+        throw new Error('Complete todos los campos');
+      }
+
+      const previsto = parseFloat(formData.gastosPrevistos);
+      const real = parseFloat(formData.gastosReales);
+
+      if (isNaN(previsto) || isNaN(real)) {
+        throw new Error('Los valores de gastos deben ser números válidos.');
+      }
+
+      const payload = {
+        usuario_id: userId,
+        descripcion: formData.descripcion.trim(),
+        monto_previsto: previsto,
+        gastos_reales: real,
+        diferencia: previsto - real
+      };
+
       let response;
       if (editIndex !== null) {
         const id = tableData[editIndex].id;
@@ -102,7 +106,9 @@ export const DbPlanificador = ({ datosPlanificador, onDataChanged }) => {
       if (onDataChanged) onDataChanged();
     } catch (error) {
       console.error('Error en el formulario:', error);
-      toast.error(error.response?.data?.message || 'Error al guardar datos');
+      toast.error(error.message || error.response?.data?.message || 'Error al procesar');
+    } finally {
+      setIsLoading(false);
     }
   };
 

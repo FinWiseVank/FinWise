@@ -97,12 +97,15 @@ export const DbAñadirMetas = ({ metas, onDataChanged }) => {
     event.preventDefault();
     setIsLoading(true);
 
-
     try {
+      const token = localStorage.getItem('token'); // Obtener el token del almacenamiento local
+      if (!token) {
+        throw new Error('Usuario no autenticado. Por favor, inicie sesión nuevamente.');
+      }
 
-      const userId = localStorage.getItem('userId'); // 👈 obtenemos el ID del usuario
+      const userId = JSON.parse(atob(token.split('.')[1])).id; // Decodificar el token para obtener el userId
       if (!userId) {
-        throw new Error('Usuario no autenticado');
+        throw new Error('Usuario no autenticado. Por favor, inicie sesión nuevamente.');
       }
 
       if (formMode === 'create') {
@@ -112,12 +115,12 @@ export const DbAñadirMetas = ({ metas, onDataChanged }) => {
         }
 
         const montoFinal = parseFloat(formData.montoFinal);
-        if (isNaN(montoFinal) || montoFinal < 1000) { // Permitir valores mayores o iguales a 1000
+        if (isNaN(montoFinal) || montoFinal < 1000) {
           throw new Error('Monto objetivo debe ser mayor o igual a 1000');
         }
 
         const payload = {
-          usuario_id: userId, 
+          usuario_id: userId,
           titulo: formData.titulo.trim(),
           fecha_limite: formData.fechaLimite,
           monto_objetivo: montoFinal
@@ -134,7 +137,7 @@ export const DbAñadirMetas = ({ metas, onDataChanged }) => {
 
         await axios.put('http://localhost:3000/dashboard/modifyGoal', {
           meta_id: formData.meta_id,
-          monto_actual: parseFloat(formData.montoActual) + parseFloat(formData.monto_actual) // Sumar nueva cantidad al monto actual
+          monto_actual: parseFloat(formData.montoActual) + parseFloat(formData.monto_actual)
         });
         toast.success('¡Ahorro actualizado!');
       }
