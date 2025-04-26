@@ -24,10 +24,20 @@ const Dashboard = () => {
   const dropdownRef = useRef(null);
 
   const fetchData = async () => {
+    
     try {
-      const res = await axios.get('http://localhost:3000/dashboard/data');
-      setData(res.data.data);
-      console.log('Datos del dashboard', res.data.data);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Token no encontrado');
+      }
+      const res = await axios.get('http://localhost:3000/dashboard', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log('Datos del dashboard:', res.data);
+
+      
     } catch (error) {
       console.error('Error al obtener los datos del dashboard:', error);
     }
