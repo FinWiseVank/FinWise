@@ -6,7 +6,6 @@ import { DbInicio } from '../components/DbInicio';
 import { DbPlanificador } from '../components/DbPlanificador';
 import { DbAñadirMetas } from '../components/DbAñadirMetas';
 import { DbAñadirRecordatorio } from '../components/DbAñadirRecordatorio';
-import { FaDollarSign } from "react-icons/fa6";
 import { FaBell } from "react-icons/fa"; // Importa el ícono de campana
 import { FaSignOutAlt } from "react-icons/fa"; // Importar el ícono de cerrar sesión
 import { Messages } from '../components/Messages';
@@ -31,6 +30,7 @@ const Dashboard = () => {
       if (!token) {
         throw new Error('Token no encontrado');
       }
+      //const res = await axios.get('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/user/dashboard', {)
       const res = await axios.get('http://localhost:3000/dashboard/data', {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -47,6 +47,7 @@ const Dashboard = () => {
 
   const fetchNotificaciones = async () => {
     try {
+      //const res = await axios.get('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/notificaciones');
       const res = await axios.get('http://localhost:3000/dashboard/notificaciones');
       setNotificaciones(res.data.notificaciones || []);
       setNuevasNotificaciones(res.data.notificaciones.some(notif => !notif.leida));
@@ -80,6 +81,7 @@ const Dashboard = () => {
 
   const marcarComoLeidas = async () => {
     try {
+      //const res = await axios.post('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/notificaciones/marcar-leidas');
       await axios.post('http://localhost:3000/dashboard/notificaciones/marcar-leidas');
       setNuevasNotificaciones(false); // Desactiva la animación
       fetchNotificaciones(); // Actualiza las notificaciones

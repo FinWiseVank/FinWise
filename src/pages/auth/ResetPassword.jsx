@@ -25,6 +25,7 @@ const ResetPassword = () => {
     }
 
     try {
+      // await axios.post('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/user/reset-password', {
       await axios.post('http://localhost:3000/user/reset-password', {
         token: token,
         contrasenia: newPassword
