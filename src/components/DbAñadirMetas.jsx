@@ -71,7 +71,7 @@ export const DbAñadirMetas = ({ metas, onDataChanged }) => {
             <button
               onClick={async () => {
                 try {
-                  //await axios.delete('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/deleteGoal', {
+                  console.log('Enviando meta_id al backend:', metaToDelete.meta_id); // Registro de depuración
                   await axios.delete('http://localhost:3000/dashboard/deleteGoal', {
                     data: { id: metaToDelete.meta_id } // Asegurarse de enviar el ID con la clave correcta
                   });
