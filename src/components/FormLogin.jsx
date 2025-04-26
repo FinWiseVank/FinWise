@@ -90,6 +90,11 @@ const Form = () => {
         if(token){
             setAuthToken(token); // Establece el token en axios
             try {
+                //const response = await axios.get('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/user/profile', {
+                   // headers: {  
+                   //     Authorization: `Bearer ${token}`
+                   // }
+                   // });
                 const response = await axios.get('http://localhost:3000/user/profile', {
                     headers: {
                         Authorization: `Bearer ${token}`
