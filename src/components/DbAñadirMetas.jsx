@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box } from './Box';
 import { Button } from './Button';
 import FormTemplate from './FormTemplate';
@@ -21,6 +21,11 @@ export const DbAñadirMetas = ({ metas, onDataChanged }) => {
   const [hoveredMetaIndex, setHoveredMetaIndex] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [formMode, setFormMode] = useState('create');
+  const [localMetas, setLocalMetas] = useState([]);
+
+  useEffect(() => {
+    setLocalMetas(metas); // Actualizar datos locales cuando cambien las metas
+  }, [metas]);
 
   const handleAddMeta = () => {
     setFormData({
@@ -35,18 +40,19 @@ export const DbAñadirMetas = ({ metas, onDataChanged }) => {
   };
 
   const handleEditMeta = (index) => {
-    const metaToEdit = metas[index];
+    const metaToEdit = localMetas[index];
     setFormData({ 
       ...metaToEdit,
       fechaLimite: metaToEdit.fecha_limite.split('T')[0],
-      montoActual: metaToEdit.monto_actual.toString()
+      montoActual: metaToEdit.monto_actual.toString(),
+      montoFinal: metaToEdit.monto_objetivo.toString() // Asegurar que montoFinal se asigne correctamente
     });
     setFormMode('update');
     setShowForm(true);
   };
 
   const handleDeleteMeta = async (index) => {
-    const metaToDelete = metas[index];
+    const metaToDelete = localMetas[index];
     confirmAlert({
       customUI: ({ onClose }) => (
         <div className="bg-white p-6 rounded-lg shadow-lg border-2 border-blue-500">
@@ -119,7 +125,7 @@ export const DbAñadirMetas = ({ metas, onDataChanged }) => {
 
         await axios.put('http://localhost:3000/dashboard/modifyGoal', {
           meta_id: formData.meta_id,
-          monto_actual: montoActual
+          monto_actual: parseFloat(formData.montoActual) + parseFloat(formData.monto_actual) // Sumar nueva cantidad al monto actual
         });
         toast.success('¡Ahorro actualizado!');
       }
@@ -168,7 +174,7 @@ export const DbAñadirMetas = ({ metas, onDataChanged }) => {
     <div className="p-4">
       <h1 className="text-center text-2xl font-bold my-4 text-blue-600">Mis Metas de Ahorro</h1>
       
-      {(!metas || metas.length === 0) && (
+      {(!localMetas || localMetas.length === 0) && (
         <div className="text-center py-8">
           <FaBox className="mx-auto text-5xl text-gray-300 mb-4" />
           <p className="text-gray-500">No tienes metas creadas aún</p>
@@ -176,7 +182,7 @@ export const DbAñadirMetas = ({ metas, onDataChanged }) => {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-        {metas?.map((meta, index) => {
+        {localMetas?.map((meta, index) => {
           if (!meta || !meta.meta_id) { // Cambiar validación para usar meta.meta_id
             console.warn(`Meta inválida en el índice ${index}:`, meta);
             return null; // Ignorar metas inválidas
@@ -203,11 +209,11 @@ export const DbAñadirMetas = ({ metas, onDataChanged }) => {
                 <div className="mt-3 space-y-1">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500">Objetivo:</span>
-                    <span className="font-medium">${(meta.monto_objetivo || 0).toLocaleString()}</span>
+                    <span className="font-medium">${parseFloat(meta.monto_objetivo || 0).toString()}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500">Ahorrado:</span>
-                    <span className="font-medium">${(meta.monto_actual || 0).toLocaleString()}</span>
+                    <span className="font-medium">${parseFloat(meta.monto_actual || 0).toString()}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500">Fecha límite:</span>
@@ -224,7 +230,7 @@ export const DbAñadirMetas = ({ metas, onDataChanged }) => {
                   </div>
                   <div className="flex justify-between text-xs text-gray-500 mt-1">
                     <span>{porcentaje.toFixed(0)}% completado</span>
-                    <span>${((meta.monto_objetivo || 0) - (meta.monto_actual || 0)).toLocaleString()} restantes</span>
+                    <span>${parseFloat((meta.monto_objetivo || 0) - (meta.monto_actual || 0)).toString()} restantes</span>
                   </div>
                 </div>
               </Box>
@@ -314,7 +320,7 @@ export const DbAñadirMetas = ({ metas, onDataChanged }) => {
                 <div className="bg-gray-50 p-3 rounded-md mb-3">
                   <h3 className="font-semibold">{formData.titulo}</h3>
                   <div className="flex justify-between text-sm mt-1">
-                    <span>Objetivo: ${parseFloat(formData.montoFinal || 0).toLocaleString()}</span> {/* Asegurar que montoFinal sea un número */}
+                    <span>Objetivo: ${parseFloat(formData.montoFinal || 0).toLocaleString()}</span> {/* Mostrar objetivo correctamente */}
                     <span>Fecha: {new Date(formData.fechaLimite).toLocaleDateString()}</span>
                   </div>
                 </div>

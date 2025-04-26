@@ -258,7 +258,7 @@ export const DbInicio = ({ resumenFinanzas, transacciones }) => {
                   <li key={t.id} className="flex justify-between border-b pb-2">
                     <span>{t.descripcion}</span>
                     <span className={t.tipo === 'gasto' ? 'text-red-500' : 'text-green-500'}>
-                      {t.tipo === 'gasto' ? '-' : '+'} ${parseFloat(t.monto).toFixed(2)}
+                      {t.tipo === 'gasto' ? '-' : '+'} ${parseFloat(t.monto).toString()}
                     </span>
                   </li>
                 ))
@@ -319,7 +319,7 @@ export const DbInicio = ({ resumenFinanzas, transacciones }) => {
                 <li key={t.id} className="flex justify-between border-b pb-2">
                   <span>{t.descripcion}</span>
                   <span className={t.tipo === 'gasto' ? 'text-red-500' : 'text-green-500'}>
-                    {t.tipo === 'gasto' ? '-' : '+'} ${parseFloat(t.monto).toFixed(2)}
+                    {t.tipo === 'gasto' ? '-' : '+'} ${parseFloat(t.monto).toString()}
                   </span>
                 </li>
               ))}
@@ -338,7 +338,7 @@ export const DbInicio = ({ resumenFinanzas, transacciones }) => {
                   <li key={t.id} className="flex justify-between border-b pb-2">
                     <span>{t.descripcion}</span>
                     <span className={t.tipo === 'gasto' ? 'text-red-500' : 'text-green-500'}>
-                      {t.tipo === 'gasto' ? '-' : '+'} ${parseFloat(t.monto).toFixed(2)}
+                      {t.tipo === 'gasto' ? '-' : '+'} ${parseFloat(t.monto).toString()}
                     </span>
                   </li>
                 ))
