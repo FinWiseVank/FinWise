@@ -28,18 +28,56 @@ export const Messages = () => {
     if (showChat) inputRef.current?.focus();
   }, [showChat]);
 
+  // Desplazar al último mensaje cuando se actualicen los mensajes
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: 'smooth', // Desplazamiento suave
+      });
+    }
+  }, [chatMessages]);
+
   const toggleChat = () => setShowChat((prev) => !prev);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (message.trim()) {
+      const userMessage = message.trim();
+
       setChatMessages((prev) => [...prev, { text: message, sender: 'user' }]);
       setMessage('');
-      setTimeout(() => {
+
+      try {
+        const response = await fetch('http://localhost:3000/dashboard/askAI', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`, // Asegurar que el token se envía
+          },
+          body: JSON.stringify({ question: userMessage }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setChatMessages((prev) => [
+            ...prev,
+            { text: data.response, sender: 'bot' },
+          ]);
+        } else {
+          console.error('Error al procesar la respuesta:', data);
+          setChatMessages((prev) => [
+            ...prev,
+            { text: 'Hubo un error al procesar tu mensaje. Por favor, intenta nuevamente.', sender: 'bot' },
+          ]);
+        }
+      } catch (error) {
+        console.error('Error al enviar el mensaje:', error);
         setChatMessages((prev) => [
           ...prev,
-          { text: 'Gracias por tu mensaje. Estoy aquí para ayudarte.', sender: 'bot' },
+          { text: 'Error al conectar con el servidor. Por favor, verifica tu conexión.', sender: 'bot' },
         ]);
-      }, 1000);
+      }
     }
   };
 
@@ -60,14 +98,14 @@ export const Messages = () => {
               <h2 className="text-lg font-bold">Chatbot</h2>
               <button 
                 onClick={toggleChat}
-                className="text-white hover:text-gray-200 focus:outline-none"
+                className="text-white hover:text-gray-200 focus:outline-none cursor-pointer"
                 aria-label="Cerrar chat"
               >
                 <FaTimes />
               </button>
             </div>
             
-            <div className="flex-1 overflow-y-auto p-3 bg-white border border-gray-300 rounded-lg m-0.5">
+            <div className="flex-1 overflow-y-auto p-3 bg-white border border-gray-300 rounded-lg m-0.5" ref={chatContainerRef}>
               {chatMessages.map((msg, index) => (
                 <div
                   key={index}
@@ -120,7 +158,7 @@ export const Messages = () => {
       <div className="fixed bottom-6 right-6 z-[9999]">
         <button 
           onClick={toggleChat}
-          className="p-4 bg-blue-500 text-white rounded-full shadow-lg transition-transform hover:scale-110 hover:bg-blue-600 focus:outline-none"
+          className="p-4 bg-blue-500 text-white rounded-full shadow-lg transition-transform hover:scale-110 hover:bg-blue-600 focus:outline-none cursor-pointer"
           aria-label={showChat ? "Cerrar chat" : "Abrir chat"}
         >
           {showChat ? <FaTimes /> : <FaComments />}
