@@ -28,6 +28,13 @@ export const Messages = () => {
     if (showChat) inputRef.current?.focus();
   }, [showChat]);
 
+  // Desplazar al último mensaje cuando se actualicen los mensajes
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [chatMessages]);
+
   const toggleChat = () => setShowChat((prev) => !prev);
 
   const handleSendMessage = async () => {
@@ -94,7 +101,7 @@ export const Messages = () => {
               </button>
             </div>
             
-            <div className="flex-1 overflow-y-auto p-3 bg-white border border-gray-300 rounded-lg m-0.5">
+            <div className="flex-1 overflow-y-auto p-3 bg-white border border-gray-300 rounded-lg m-0.5" ref={chatContainerRef}>
               {chatMessages.map((msg, index) => (
                 <div
                   key={index}

@@ -36,8 +36,8 @@ const Dashboard = () => {
   const fetchNotificaciones = async () => {
     try {
       const res = await axios.get('http://localhost:3000/dashboard/notificaciones');
-      setNotificaciones(res.data.notificaciones || []); // Maneja un array vacío si no hay notificaciones
-      setNuevasNotificaciones(res.data.notificaciones.some(notif => !notif.leida)); // Marca como nuevas si hay alguna no leída
+      setNotificaciones(res.data.notificaciones || []);
+      setNuevasNotificaciones(res.data.notificaciones.some(notif => !notif.leida));
     } catch (error) {
       console.error('Error al obtener las notificaciones:', error);
       toast.error('Error al cargar notificaciones');
@@ -61,7 +61,9 @@ const Dashboard = () => {
 
   // Función para forzar actualización
   const triggerRefresh = () => {
-    setRefreshTrigger(prev => prev + 1);
+    setRefreshTrigger((prev) => prev + 1);
+    // arreglo de actualizacion de datos
+    fetchData(); // Asegurarse de obtener los datos actualizados inmediatamente
   };
 
   const marcarComoLeidas = async () => {
