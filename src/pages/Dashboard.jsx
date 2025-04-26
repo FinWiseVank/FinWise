@@ -93,16 +93,20 @@ const Dashboard = () => {
     setMostrarDropdown(!mostrarDropdown);
   };
 
-  const handleLogout = async () => {
-    try {
-      await axios.post('/api/logout');
-      localStorage.removeItem('authToken'); // Ejemplo para localStorage
-      sessionStorage.removeItem('authToken'); // Ejemplo para sessionStorage
-      navigate('/login');
-    } catch (error) {
-      console.error('Error al cerrar sesión:', error);
-    }
-  };
+   //Función para cerrar sesión
+   const handleLogout = () => {
+    localStorage.removeItem('token'); //Elimina el token del localStorage
+
+    delete axios.defaults.headers.common['Authorization']; //Elimina el token de las solicitudes de axios
+
+    toast.success('Sesión cerrada exitosamente', {
+        theme: "colored",
+        position: "top-center",
+    });
+
+    //Redirige al usuario a la página de login
+    navigate('/iniciar-sesion');
+  }
 
   const contentMap = {
     inicio: <DbInicio  resumenFinanzas={data?.resumenFinanzas}onTransactionAdded={triggerRefresh}transacciones={data?.transacciones}/>,
@@ -177,7 +181,7 @@ const Dashboard = () => {
           <UserName nombreUsuario={data?.nombreUsuario}/>
           <button 
             onClick={handleLogout} 
-            className="px-0.8 py-0.5 bg-red-500 text-white rounded hover:bg-red-600 transition-transform transform hover:scale-105"
+            className="px-5 py-2 bg-red-500 text-white rounded-3xl hover:bg-red-600 transition-transform transform hover:scale-105"
           >
             Cerrar Sesión
           </button>

@@ -103,7 +103,6 @@ const Form = () => {
         }
     }
    
-
     return (    
         <div className='bg-[#FDFFFC] px-20 py-20 rounded-2xl border-2 border-gray-100'>
             <h1 className='text-5xl font-semibold'>FinWise</h1>

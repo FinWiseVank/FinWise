@@ -59,7 +59,7 @@ const FormRegister = () => {
     };
 
     return (    
-        <div className='bg-[#FDFFFC] px-10 py-2 rounded-2xl border-2 border-gray-100'>
+        <div className='bg-[#FDFFFC] px-15 py-13 rounded-2xl border-2 border-gray-100'>
             <h1 className='text-5xl mt-1 font-semibold'>FinWise</h1>
             <p className='font-medium text-lg text-[#5EA3D4] mt-2'>Crear una cuenta</p>
 
