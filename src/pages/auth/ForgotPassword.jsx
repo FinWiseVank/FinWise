@@ -12,8 +12,8 @@ const ForgotPassword = () => {
     e.preventDefault();
 
     try {
-      // await axios.post('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/user/forgot-password', { email });
-      await axios.post('http://localhost:3000/user/forgot-password', { email });
+      await axios.post('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/user/forgot-password', { email });
+      //await axios.post('http://localhost:3000/user/forgot-password', { email });
       toast.success('Correo enviado con instrucciones para restablecer la contraseña');
     } catch (error) {
       toast.error(error.response?.data?.error || 'Error al enviar el correo');

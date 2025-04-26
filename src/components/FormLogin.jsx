@@ -34,8 +34,8 @@ const Form = () => {
         }
 
         try {
-           // const response = await axios.post('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/user/login', { email, contrasenia: password });
-           const response = await axios.post('http://localhost:3000/user/login', { email, contrasenia: password }); 
+           const response = await axios.post('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/user/login', { email, contrasenia: password });
+           //const response = await axios.post('http://localhost:3000/user/login', { email, contrasenia: password }); 
            
            const { token } = response.data;
            //Almacena el token en el localStorage
@@ -90,16 +90,12 @@ const Form = () => {
         if(token){
             setAuthToken(token); // Establece el token en axios
             try {
-                //const response = await axios.get('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/user/profile', {
-                   // headers: {  
-                   //     Authorization: `Bearer ${token}`
-                   // }
-                   // });
-                const response = await axios.get('http://localhost:3000/user/profile', {
-                    headers: {
+                const response = await axios.get('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/user/profile', {
+                    headers: {  
                         Authorization: `Bearer ${token}`
                     }
-                });
+                    });
+                
                 console.log("Authorization header:", axios.defaults.headers.common['Authorization']);
                 console.log("Respuesta:", response.data);       
                 navigate('/dashboard');

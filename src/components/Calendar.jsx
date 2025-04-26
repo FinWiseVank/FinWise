@@ -79,8 +79,8 @@ export const Calendar = ({ recordatorios = [], onRecordatorioAdded }) => {
     if (!selectedEvent) return;
 
     try {
-      // await axios.delete(`https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/deleteReminder/${selectedEvent.id}`);
-      await axios.delete('http://localhost:3000/dashboard/deleteReminder', {
+       await axios.delete(`https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/deleteReminder`, {
+      //await axios.delete('http://localhost:3000/dashboard/deleteReminder', {
         data: { id: selectedEvent.id },
       });
 
@@ -104,8 +104,8 @@ export const Calendar = ({ recordatorios = [], onRecordatorioAdded }) => {
 
     try {
       if (selectedEvent) {
-        //const response = await axios.put(`https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/modifyReminder`, {
-        const response = await axios.put('http://localhost:3000/dashboard/modifyReminder', {
+        const response = await axios.put(`https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/modifyReminder`, {
+        //const response = await axios.put('http://localhost:3000/dashboard/modifyReminder', {
           id: selectedEvent.id,
           nombre: newEvent.title,
           estado: 'pendiente',
@@ -127,8 +127,8 @@ export const Calendar = ({ recordatorios = [], onRecordatorioAdded }) => {
         );
         toast.success('Recordatorio modificado correctamente.');
       } else {
-        //const response = await axios.post(`https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/addReminder`, {
-        const response = await axios.post('http://localhost:3000/dashboard/addReminder', {
+        const response = await axios.post(`https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/addReminder`, {
+        //const response = await axios.post('http://localhost:3000/dashboard/addReminder', {
           nombre: newEvent.title,
           estado: 'pendiente',
           fecha_inicio: newEvent.start,

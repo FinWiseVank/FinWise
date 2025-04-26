@@ -71,8 +71,8 @@ export const DbAñadirMetas = ({ metas, onDataChanged }) => {
             <button
               onClick={async () => {
                 try {
-                  //await axios.delete('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/deleteGoal', {
-                  await axios.delete('http://localhost:3000/dashboard/deleteGoal', {
+                  await axios.delete('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/deleteGoal', {
+                  //await axios.delete('http://localhost:3000/dashboard/deleteGoal', {
                     data: { id: metaToDelete.meta_id } // Asegurarse de enviar el ID con la clave correcta
                   });
                   toast.success('Meta eliminada correctamente');
@@ -127,8 +127,8 @@ export const DbAñadirMetas = ({ metas, onDataChanged }) => {
           monto_objetivo: montoFinal
         };
 
-        //await axios.post('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/addGoal', payload);
-        await axios.post('http://localhost:3000/dashboard/addGoal', payload);
+        await axios.post('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/addGoal', payload);
+       // await axios.post('http://localhost:3000/dashboard/addGoal', payload);
         toast.success('¡Meta creada con éxito!');
       } else {
         // Validación actualización
@@ -137,8 +137,8 @@ export const DbAñadirMetas = ({ metas, onDataChanged }) => {
           throw new Error('Monto actual inválido');
         }
 
-        //await axios.put('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/modifyGoal', {
-        await axios.put('http://localhost:3000/dashboard/modifyGoal', {
+        await axios.put('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/modifyGoal', {
+        //await axios.put('http://localhost:3000/dashboard/modifyGoal', {
           meta_id: formData.meta_id,
           monto_actual: parseFloat(formData.montoActual) + parseFloat(formData.monto_actual)
         });

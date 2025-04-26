@@ -38,8 +38,8 @@ const FormRegister = () => {
         }
 
         try {
-            //const response = await axios.post('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/user/register', {
-            const response = await axios.post('http://localhost:3000/user/register', {  
+            const response = await axios.post('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/user/register', {
+            //const response = await axios.post('http://localhost:3000/user/register', {  
                 nombre: name,
                 apellidos: lastName,
                 email,

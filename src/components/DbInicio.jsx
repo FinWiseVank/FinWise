@@ -72,8 +72,8 @@ export const DbInicio = ({ resumenFinanzas, transacciones }) => {
         tipo: transactionType.toLowerCase(),
         fecha: new Date().toISOString()
       };
-      //await axios.post('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/addTransactions', nuevaTransaccion);
-      await axios.post('http://localhost:3000/dashboard/addTransactions', nuevaTransaccion);
+      await axios.post('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/addTransactions', nuevaTransaccion);
+      //await axios.post('http://localhost:3000/dashboard/addTransactions', nuevaTransaccion);
       toast.success('Transacción registrada exitosamente', {
         theme: 'colored',
         position: 'top-center'
