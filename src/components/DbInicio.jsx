@@ -23,6 +23,25 @@ export const DbInicio = ({ resumenFinanzas, transacciones }) => {
   const [showResumenModal, setShowResumenModal] = useState(false);
   const [resumenType, setResumenType] = useState(''); // 'ingresos' o 'gastos'
   const [showTransaccionesModal, setShowTransaccionesModal] = useState(false);
+  const [resumenFinanzasState, setResumenFinanzas] = useState(resumenFinanzas);
+  const [transaccionesState, setTransacciones] = useState(transacciones);
+
+  const fetchDashboardData = async () => {
+    try { 
+      //const response = await axios.get('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/getData');
+      const response = await axios.get('http://localhost:3000/dashboard/getData');
+      const { resumenFinanzas, transacciones } = response.data;
+      // Actualizar los estados con los datos obtenidos
+      setResumenFinanzas(resumenFinanzas);
+      setTransacciones(transacciones);
+    } catch (error) {
+      console.error('Error al obtener los datos del dashboard:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardData(); // Llamar a la función al montar el componente
+  }, []);
 
   const toggleSubmenu = () => setShowSubmenu(!showSubmenu);
   const closeSubmenu = () => setShowSubmenu(false);
@@ -31,6 +50,7 @@ export const DbInicio = ({ resumenFinanzas, transacciones }) => {
     setTransactionType(type);
     setShowTransactionForm(true);
     try {
+      //const response = await axios.get('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/getCategory?tipo=${type.toLowerCase()}');
       const response = await axios.get(`http://localhost:3000/dashboard/getCategory?tipo=${type.toLowerCase()}`);
       setCategorias(response.data.data || []);
     } catch (error) {
@@ -68,7 +88,7 @@ export const DbInicio = ({ resumenFinanzas, transacciones }) => {
         theme: 'colored',
         position: 'top-center'
       });
-      await fetchDashboardData();
+      await fetchDashboardData(); // Asegurarse de actualizar los datos después de agregar la transacción
     } catch (error) {
       console.error('Error al enviar transacción:', error);
     } finally {
@@ -116,10 +136,10 @@ export const DbInicio = ({ resumenFinanzas, transacciones }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const ingresosMensuales = resumenFinanzas?.ingresosMensuales ?? [];
-  const gastosMensuales = resumenFinanzas?.gastosMensuales ?? [];
-  const resumenGastos = resumenFinanzas?.resumenGastos ?? [];
-  const resumenIngresos = resumenFinanzas?.resumenIngresos ?? [];
+  const ingresosMensuales = resumenFinanzasState?.ingresosMensuales ?? [];
+  const gastosMensuales = resumenFinanzasState?.gastosMensuales ?? [];
+  const resumenGastos = resumenFinanzasState?.resumenGastos ?? [];
+  const resumenIngresos = resumenFinanzasState?.resumenIngresos ?? [];
 
   const selectedCategoria = categorias.find(cat => cat.id === parseInt(transactionData.categoria_id));
 
@@ -253,8 +273,8 @@ export const DbInicio = ({ resumenFinanzas, transacciones }) => {
           <div className="flex flex-col items-center justify-center w-full h-full">
             <h2 className="text-lg md:text-2xl font-bold mb-4">Transacciones</h2>
             <ul className="w-full space-y-2">
-              {transacciones?.length ? (
-                transacciones.slice(0, 6).map((t) => (
+              {transaccionesState?.length ? (
+                transaccionesState.slice(0, 6).map((t) => (
                   <li key={t.id} className="flex justify-between border-b pb-2">
                     <span>{t.descripcion}</span>
                     <span className={t.tipo === 'gasto' ? 'text-red-500' : 'text-green-500'}>
@@ -315,7 +335,7 @@ export const DbInicio = ({ resumenFinanzas, transacciones }) => {
               />
             </div>
             <ul className="space-y-2">
-              {(resumenType === 'gastos' ? transacciones.filter(t => t.tipo === 'gasto') : transacciones.filter(t => t.tipo === 'ingreso')).map(t => (
+              {(resumenType === 'gastos' ? transaccionesState.filter(t => t.tipo === 'gasto') : transaccionesState.filter(t => t.tipo === 'ingreso')).map(t => (
                 <li key={t.id} className="flex justify-between border-b pb-2">
                   <span>{t.descripcion}</span>
                   <span className={t.tipo === 'gasto' ? 'text-red-500' : 'text-green-500'}>
@@ -333,8 +353,8 @@ export const DbInicio = ({ resumenFinanzas, transacciones }) => {
           <div className="p-6">
             <h2 className="text-lg md:text-2xl font-bold mb-4 text-center">Todas las Transacciones</h2>
             <ul className="space-y-2">
-              {transacciones?.length ? (
-                transacciones.map((t) => (
+              {transaccionesState?.length ? (
+                transaccionesState.map((t) => (
                   <li key={t.id} className="flex justify-between border-b pb-2">
                     <span>{t.descripcion}</span>
                     <span className={t.tipo === 'gasto' ? 'text-red-500' : 'text-green-500'}>

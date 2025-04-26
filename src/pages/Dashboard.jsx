@@ -30,12 +30,13 @@ const Dashboard = () => {
       if (!token) {
         throw new Error('Token no encontrado');
       }
-      const res = await axios.get('http://localhost:3000/dashboard', {
+      const res = await axios.get('http://localhost:3000/dashboard/data', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       console.log('Datos del dashboard:', res.data);
+      setData(res.data.data);
 
       
     } catch (error) {
@@ -56,7 +57,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchData();
-    fetchNotificaciones(); // Asegúrate de llamar a esta función para cargar las notificaciones
+    //fetchNotificaciones(); // Asegúrate de llamar a esta función para cargar las notificaciones
   }, [refreshTrigger]); // Añadir refreshTrigger como dependencia
 
   useEffect(() => {
