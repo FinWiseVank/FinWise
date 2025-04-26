@@ -39,6 +39,7 @@ export const DbInicio = ({ resumenFinanzas, transacciones }) => {
     setTransactionType(type);
     setShowTransactionForm(true);
     try {
+      //const response = await axios.get('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/getCategory?tipo=${type.toLowerCase()}`);
       const response = await axios.get(`http://localhost:3000/dashboard/getCategory?tipo=${type.toLowerCase()}`);
       setCategorias(response.data.data || []);
     } catch (error) {
@@ -71,6 +72,7 @@ export const DbInicio = ({ resumenFinanzas, transacciones }) => {
         tipo: transactionType.toLowerCase(),
         fecha: new Date().toISOString()
       };
+      //await axios.post('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/addTransactions', nuevaTransaccion);
       await axios.post('http://localhost:3000/dashboard/addTransactions', nuevaTransaccion);
       toast.success('Transacción registrada exitosamente', {
         theme: 'colored',

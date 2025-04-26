@@ -77,11 +77,13 @@ export const DbPlanificador = ({ datosPlanificador, onDataChanged }) => {
       let response;
       if (editIndex !== null) {
         const id = tableData[editIndex].id;
+        //response = await axios.put('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/modifyExpensePlanner', {
         response = await axios.put('http://localhost:3000/dashboard/modifyExpensePlanner', {
           ...payload,
           id
         });
       } else {
+        //response = await axios.post('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/addExpensePlanner', payload);
         response = await axios.post('http://localhost:3000/dashboard/addExpensePlanner', payload);
       }
 
@@ -135,6 +137,7 @@ export const DbPlanificador = ({ datosPlanificador, onDataChanged }) => {
   const handleDeleteRow = async (index) => {
     const rowToDelete = tableData[index];
     try {
+      //await axios.delete('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/deleteExpensePlanner', {
       await axios.delete('http://localhost:3000/dashboard/deleteExpensePlanner', {
         data: { id: rowToDelete.id }
       });
