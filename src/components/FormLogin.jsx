@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Link, useNavigate} from  "react-router-dom";
 import {toast} from 'react-toastify'; 
 import axios from 'axios';
@@ -10,6 +10,10 @@ const Form = () => {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+
+    useEffect(() => {
+        initializeApp(); // Llama a la función al cargar el componente
+    },[]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -37,6 +41,7 @@ const Form = () => {
            const { token } = response.data;
            //Almacena el token en el localStorage
             localStorage.setItem('token', token);
+            setAuthToken(token); 
 
             //muestra un mensaje de éxito
            toast.success('Inicio de sesión exitoso', {
@@ -53,6 +58,51 @@ const Form = () => {
             });
         }
     }
+
+    function setAuthToken(token) {
+        if(token) {
+            // Aplica el token a cada solicitud si existe
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        }else {
+            // Elimina el token de las solicitudes
+            delete axios.defaults.headers.common['Authorization'];
+        }
+    }
+
+    function initializeApp(){
+        // 2. Intentar recuperar el token de localStorage al cargar la app
+        const token = localStorage.getItem('token');
+
+        setAuthToken(token); // Establece el token en axios
+        validarToken();
+
+    }
+
+    async function validarToken() {
+        const token = localStorage.getItem('token');
+
+        console.log("Token recuperado:", token);
+
+        if(token){
+            setAuthToken(token); // Establece el token en axios
+            try {
+                const response = await axios.get('http://localhost:3000/user/profile', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                console.log("Authorization header:", axios.defaults.headers.common['Authorization']);
+                console.log("Respuesta:", response.data);       
+                navigate('/dashboard');
+            }catch(error){
+                console.error('Error al verificar token:', error);
+            }
+
+        }else {
+            console.log('No hay token almacenado.');
+        }
+    }
+   
 
     return (    
         <div className='bg-[#FDFFFC] px-20 py-20 rounded-2xl border-2 border-gray-100'>
