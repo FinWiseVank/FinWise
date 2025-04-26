@@ -45,6 +45,11 @@ const ResetPassword = () => {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
+      <button
+          onClick={() => navigate('/restaurar-contraseña')}
+          className="absolute top-4 left-4 py-2 px-6 border-2 border-gray-400 text-gray-600 font-semibold rounded-3xl hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-600"
+          > &lt; Atrás
+      </button>
       <div className="w-full max-w-md p-8 bg-white shadow-lg rounded-lg">
         <h2 className="text-2xl font-semibold text-center text-gray-700 mb-6">Restablecer Contraseña</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -63,7 +68,7 @@ const ResetPassword = () => {
             type="submit"
             className="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            Restablecer nueva contraseña
+            Guardar nueva contraseña
           </button>
         </form>
       </div>
