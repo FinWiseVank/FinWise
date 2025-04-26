@@ -31,7 +31,10 @@ export const Messages = () => {
   // Desplazar al último mensaje cuando se actualicen los mensajes
   useEffect(() => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: 'smooth', // Desplazamiento suave
+      });
     }
   }, [chatMessages]);
 
@@ -43,36 +46,37 @@ export const Messages = () => {
 
       setChatMessages((prev) => [...prev, { text: message, sender: 'user' }]);
       setMessage('');
-      
-      try{
+
+      try {
         const response = await fetch('http://localhost:3000/dashboard/askAI', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-             // Si usas JWT o algo similar:ge, sender: 'user' }]);
-             // 'Authorization': `Bearer ${token}`
+            Authorization: `Bearer ${localStorage.getItem('token')}`, // Asegurar que el token se envía
           },
           body: JSON.stringify({ question: userMessage }),
         });
 
-          const data = await response.json();
+        const data = await response.json();
 
-          if (response.ok) {
-            setChatMessages((prev) => [
-              ...prev,
-              { text: data.response, sender: 'bot' }, // Suponiendo que el backend responde con { response: '...' }
-            ]);
-          } else {
-            setChatMessages((prev) => [
-              ...prev,
-              { text: 'Hubo un error al procesar tu mensaje.', sender: 'bot' },
-            ]);
-            console.error('Error al enviar mensaje:', data);
-          }
-
-      }catch (error) {
+        if (response.ok) {
+          setChatMessages((prev) => [
+            ...prev,
+            { text: data.response, sender: 'bot' },
+          ]);
+        } else {
+          console.error('Error al procesar la respuesta:', data);
+          setChatMessages((prev) => [
+            ...prev,
+            { text: 'Hubo un error al procesar tu mensaje. Por favor, intenta nuevamente.', sender: 'bot' },
+          ]);
+        }
+      } catch (error) {
         console.error('Error al enviar el mensaje:', error);
-        setChatMessages((prev) => [...prev, { text: 'Error al obtener respuesta del bot.', sender: 'bot' }]);
+        setChatMessages((prev) => [
+          ...prev,
+          { text: 'Error al conectar con el servidor. Por favor, verifica tu conexión.', sender: 'bot' },
+        ]);
       }
     }
   };

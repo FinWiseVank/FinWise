@@ -14,10 +14,10 @@ import { Link } from "react-router-dom";
                 <h1 className="text-white px-10 text-4xl font-bold">FinWise</h1>
                 <div className="ml-auto flex gap-4 py-8 px-10">
                     <Link to="/iniciar-sesion">
-                        <button className="px-8 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xl rounded-3xl transition duration-300">Iniciar Sesión</button>
+                        <button className="px-8 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xl rounded-3xl transition duration-300 cursor-pointer">Iniciar Sesión</button>
                     </Link>
                     <Link to="/registro">
-                        <button className="px-8 py-2 bg-green-600 hover:bg-green-700 text-white text-xl rounded-3xl transition duration-300 ml-4">Registrarse</button>
+                        <button className="px-8 py-2 bg-green-600 hover:bg-green-700 text-white text-xl rounded-3xl transition duration-300 ml-4 cursor-pointer">Registrarse</button>
                     </Link>
                 </div>
             </nav>
@@ -28,7 +28,7 @@ import { Link } from "react-router-dom";
                         con el poder de una IA que te guía con consejos personalizados. FinWise es tu asistente
                          financiero inteligente, diseñado para ayudarte a ahorrar, planificar y tomar mejores decisiones económicas cada día.</p>
                     <Link to="/iniciar-sesion">
-                        <button className=" px-8 py-2 mt-10 bg-blue-600 hover:bg-blue-700 text-white text-xl rounded-3xl transition duration-300">Comenzar</button>
+                        <button className=" px-8 py-2 mt-10 bg-blue-600 hover:bg-blue-700 text-white text-xl rounded-3xl transition duration-300 cursor-pointer">Comenzar</button>
                     </Link>
                 </div>
             </div>
