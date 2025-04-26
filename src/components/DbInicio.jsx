@@ -26,22 +26,11 @@ export const DbInicio = ({ resumenFinanzas, transacciones }) => {
   const [resumenFinanzasState, setResumenFinanzas] = useState(resumenFinanzas);
   const [transaccionesState, setTransacciones] = useState(transacciones);
 
-  const fetchDashboardData = async () => {
-    try { 
-      //const response = await axios.get('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/getData');
-      const response = await axios.get('http://localhost:3000/dashboard/getData');
-      const { resumenFinanzas, transacciones } = response.data;
-      // Actualizar los estados con los datos obtenidos
-      setResumenFinanzas(resumenFinanzas);
-      setTransacciones(transacciones);
-    } catch (error) {
-      console.error('Error al obtener los datos del dashboard:', error);
-    }
-  };
-
+  // Sincronizar estados locales con las props cuando estas cambien
   useEffect(() => {
-    fetchDashboardData(); // Llamar a la función al montar el componente
-  }, []);
+    setResumenFinanzas(resumenFinanzas);
+    setTransacciones(transacciones);
+  }, [resumenFinanzas, transacciones]);
 
   const toggleSubmenu = () => setShowSubmenu(!showSubmenu);
   const closeSubmenu = () => setShowSubmenu(false);
@@ -50,7 +39,6 @@ export const DbInicio = ({ resumenFinanzas, transacciones }) => {
     setTransactionType(type);
     setShowTransactionForm(true);
     try {
-      //const response = await axios.get('https://finwise-gedvf4egduhbajbh.brazilsouth-01.azurewebsites.net/dashboard/getCategory?tipo=${type.toLowerCase()}');
       const response = await axios.get(`http://localhost:3000/dashboard/getCategory?tipo=${type.toLowerCase()}`);
       setCategorias(response.data.data || []);
     } catch (error) {
@@ -88,7 +76,6 @@ export const DbInicio = ({ resumenFinanzas, transacciones }) => {
         theme: 'colored',
         position: 'top-center'
       });
-      await fetchDashboardData(); // Asegurarse de actualizar los datos después de agregar la transacción
     } catch (error) {
       console.error('Error al enviar transacción:', error);
     } finally {

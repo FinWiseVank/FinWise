@@ -6,7 +6,6 @@ import { DbInicio } from '../components/DbInicio';
 import { DbPlanificador } from '../components/DbPlanificador';
 import { DbAñadirMetas } from '../components/DbAñadirMetas';
 import { DbAñadirRecordatorio } from '../components/DbAñadirRecordatorio';
-import { FaDollarSign } from "react-icons/fa6";
 import { FaBell } from "react-icons/fa"; // Importa el ícono de campana
 import { FaSignOutAlt } from "react-icons/fa"; // Importar el ícono de cerrar sesión
 import { Messages } from '../components/Messages';
